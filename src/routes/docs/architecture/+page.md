@@ -106,10 +106,12 @@ Both **API** and **Dashboard** will run as OpenWorkers workers:
 
 ## Deep Dives
 
-| Topic                                     | Description                            |
-| ----------------------------------------- | -------------------------------------- |
-| [Bindings](/docs/architecture/bindings)   | How bindings work internally           |
-| [HTTP Flow](/docs/architecture/http-flow) | Request/response flow, streaming support |
+| Topic                                       | Description                              |
+| ------------------------------------------- | ---------------------------------------- |
+| [Bindings](/docs/architecture/bindings)     | How bindings work internally             |
+| [HTTP Flow](/docs/architecture/http-flow)   | Request/response flow, streaming support |
+| [Event Loop](/docs/architecture/event-loop) | V8 ↔ Rust async communication            |
+| [Security](/docs/architecture/security)     | Isolation, limits, threat model          |
 
 ---
 

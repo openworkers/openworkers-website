@@ -53,7 +53,9 @@ export const docsNav: NavItem[] = [
 		children: [
 			{ name: 'Overview', path: '/docs/architecture' },
 			{ name: 'Bindings', path: '/docs/architecture/bindings' },
-			{ name: 'HTTP Flow', path: '/docs/architecture/http-flow' }
+			{ name: 'HTTP Flow', path: '/docs/architecture/http-flow' },
+			{ name: 'Event Loop', path: '/docs/architecture/event-loop' },
+			{ name: 'Security', path: '/docs/architecture/security' }
 		]
 	}
 ];
