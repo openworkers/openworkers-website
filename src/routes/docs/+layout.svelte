@@ -112,9 +112,14 @@
           </ul>
         </nav>
 
-        <span class="mt-4 text-sm text-slate-400 hover:text-blue-500 py-8">
+        <a
+          class="mt-4 text-sm text-slate-400 hover:text-blue-500 py-8"
+          href="https://github.com/openworkers/openworkers-website/commit/{__BUILD_ID__}"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
           build {__BUILD_ID__.slice(0, 7)}
-        </span>
+        </a>
       </div>
     </aside>
 
