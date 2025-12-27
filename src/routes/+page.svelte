@@ -40,7 +40,7 @@
 				<Console title="hello.ts" content={data.codeHtml}>
 					{#snippet footer()}
 						<a
-							href="/docs/examples/poll"
+							href="/docs/examples/telegram"
 							class="flex h-12 items-center justify-center hover:bg-slate-50 hover:text-slate-800"
 						>
 							Check out more examples

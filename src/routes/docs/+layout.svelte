@@ -15,6 +15,17 @@
   let toc = $state<TocItem[]>([]);
   let activeId = $state<string>('');
   let observer: IntersectionObserver | null = null;
+  let tocContainer: HTMLDivElement;
+
+  $effect(() => {
+    if (activeId && tocContainer) {
+      const activeLink = tocContainer.querySelector(`a[href="#${activeId}"]`);
+
+      if (activeLink) {
+        activeLink.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      }
+    }
+  });
 
   function isActive(item: NavItem): boolean {
     const currentPath = page.url.pathname;
@@ -118,7 +129,7 @@
     </article>
 
     <aside class="toc hidden min-w-56 max-w-80 py-4 empty:hidden xl:flex">
-      <div class="fixed">
+      <div bind:this={tocContainer} class="fixed max-h-[calc(100vh-6rem)] overflow-y-auto scrollbar-none pb-8">
         {#if toc.length > 0}
           <div class="mb-3 text-sm font-semibold leading-6 text-slate-900">On this page</div>
           <ul class="flex flex-col gap-1 text-sm text-slate-700">

@@ -139,6 +139,7 @@
   .markdown-body h6 {
     @apply border-b pb-1;
     font-weight: 600;
+    scroll-margin-top: 6rem;
   }
 
   .markdown-body > * {
