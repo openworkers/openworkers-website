@@ -2,8 +2,6 @@
 
 Key-value storage for small data with low latency. Ideal for caching, sessions, feature flags, and configuration.
 
-> **Status:** Coming soon
-
 ## Usage
 
 ```javascript
@@ -24,24 +22,33 @@ addEventListener('fetch', async (event) => {
 
 ### get(key)
 
-Read a value by key.
+Read a value by key. Returns `null` if the key doesn't exist or has expired.
 
 ```javascript
 const value = await env.KV.get('session:abc123');
 
-// Returns null if key doesn't exist
 if (value === null) {
   console.log('Key not found');
 }
 ```
 
-### put(key, value)
+### put(key, value, options?)
 
-Write a value.
+Write a value. Optionally set an expiration time.
 
 ```javascript
+// Simple put
 await env.KV.put('user:123', JSON.stringify({ name: 'John', role: 'admin' }));
+
+// With expiration (TTL in seconds)
+await env.KV.put('session:abc', 'data', { expiresIn: 3600 }); // Expires in 1 hour
 ```
+
+| Option | Type | Description |
+|--------|------|-------------|
+| `expiresIn` | `number` | Time-to-live in seconds. Key will be automatically deleted after this time. |
+
+> **Note:** Updating a key without `expiresIn` removes any existing expiration.
 
 ### delete(key)
 
@@ -51,11 +58,31 @@ Delete a key.
 await env.KV.delete('session:expired');
 ```
 
+### list(options?)
+
+List all keys in the namespace.
+
+```javascript
+// List all keys
+const keys = await env.KV.list();
+
+// With prefix filter
+const userKeys = await env.KV.list({ prefix: 'user:' });
+
+// With limit
+const firstTen = await env.KV.list({ limit: 10 });
+```
+
+| Option | Type | Description |
+|--------|------|-------------|
+| `prefix` | `string` | Only return keys starting with this prefix. |
+| `limit` | `number` | Maximum number of keys to return (default: 1000). |
+
 ---
 
 ## Use Cases
 
-### Session storage
+### Session storage with expiration
 
 ```javascript
 addEventListener('fetch', async (event) => {
@@ -73,6 +100,9 @@ addEventListener('fetch', async (event) => {
     return;
   }
 
+  // Refresh session TTL on activity
+  await env.KV.put(`session:${sessionId}`, session, { expiresIn: 1800 });
+
   // Session valid, continue...
 });
 ```
@@ -87,7 +117,7 @@ if (flags.newCheckout) {
 }
 ```
 
-### Rate limiting
+### Rate limiting with auto-expiration
 
 ```javascript
 const ip = event.request.headers.get('CF-Connecting-IP');
@@ -99,7 +129,23 @@ if (count > 100) {
   return;
 }
 
-await env.KV.put(key, String(count + 1));
+// Auto-reset after 1 minute
+await env.KV.put(key, String(count + 1), { expiresIn: 60 });
+```
+
+### List and cleanup
+
+```javascript
+// Find all expired session markers
+const sessions = await env.KV.list({ prefix: 'session:' });
+
+for (const key of sessions) {
+  const data = await env.KV.get(key);
+
+  if (shouldCleanup(data)) {
+    await env.KV.delete(key);
+  }
+}
 ```
 
 ---
@@ -118,10 +164,10 @@ await env.KV.put(key, String(count + 1));
 
 | Feature | KV | Storage |
 |---------|-----|---------|
-| Data model | Key-value pairs | Files/objects |
+| Data model | Key-value pairs | Files/blobs |
 | Latency | Low (~ms) | Medium (~100ms) |
 | Max value | 25 MB | Unlimited |
+| Expiration | Built-in TTL | Manual |
 | Use case | Cache, sessions, config | Files, uploads, backups |
-| API | `get`, `put`, `delete` | `fetch` with HTTP methods |
 
-Use **KV** for small, frequently accessed data. Use **Storage** for larger files or when you need file semantics.
+Use **KV** for small, frequently accessed data with optional expiration. Use **Storage** for larger files or binary data.

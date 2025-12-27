@@ -21,9 +21,9 @@ See [Environment Variables](/docs/environment-variables) for setup.
 
 | Binding | Access | Description |
 |---------|--------|-------------|
-| [Storage](/docs/bindings/storage) | Read/Write | S3-compatible object storage |
-| [KV](/docs/bindings/kv) | Read/Write | Key-value store |
-| [Database](/docs/bindings/database) | Read/Write | SQL database (WIP) |
+| [Storage](/docs/bindings/storage) | Read/Write | Blob storage (S3/R2) with `get`, `put`, `head`, `list`, `delete` |
+| [KV](/docs/bindings/kv) | Read/Write | Key-value store with TTL support |
+| [Database](/docs/bindings/database) | Read/Write | SQL database (coming soon) |
 
 ---
 
