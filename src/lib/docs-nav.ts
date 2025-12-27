@@ -47,4 +47,12 @@ export const docsNav: NavItem[] = [
 			{ name: 'S3 Proxy (AWS v4)', path: '/docs/examples/s3-proxy-aws-v4' }
 		]
 	},
+	{
+		name: 'Architecture',
+		path: '/docs/architecture',
+		children: [
+			{ name: 'Overview', path: '/docs/architecture' },
+			{ name: 'Bindings', path: '/docs/architecture/bindings' }
+		]
+	}
 ];
