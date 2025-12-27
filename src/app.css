@@ -179,6 +179,23 @@
     @apply text-blue-500 hover:underline;
   }
 
+  .markdown-body table {
+    @apply w-full border-collapse text-sm;
+  }
+
+  .markdown-body th,
+  .markdown-body td {
+    @apply border border-gray-200 px-3 py-2 text-left;
+  }
+
+  .markdown-body th {
+    @apply bg-gray-50 font-semibold;
+  }
+
+  .markdown-body tr:hover {
+    @apply bg-gray-50/50;
+  }
+
   .container {
     @apply mx-auto flex px-2 xs:px-4 sm:px-6;
   }

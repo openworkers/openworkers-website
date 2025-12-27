@@ -14,8 +14,17 @@ export const docsNav: NavItem[] = [
 			{ name: 'Custom domains', path: '/docs/custom-domains' },
 			{ name: 'Online editor', path: '/docs/online-editor' },
 			{ name: 'Environment variables', path: '/docs/environment-variables' },
-			{ name: 'Bindings', path: '/docs/bindings' },
 			{ name: 'Limits & Quotas', path: '/docs/limits' }
+		]
+	},
+	{
+		name: 'Bindings',
+		path: '/docs/bindings',
+		children: [
+			{ name: 'Overview', path: '/docs/bindings' },
+			{ name: 'Storage', path: '/docs/bindings/storage' },
+			{ name: 'KV', path: '/docs/bindings/kv' },
+			{ name: 'Database', path: '/docs/bindings/database' }
 		]
 	},
 	{
@@ -38,11 +47,4 @@ export const docsNav: NavItem[] = [
 			{ name: 'S3 Proxy (AWS v4)', path: '/docs/examples/s3-proxy-aws-v4' }
 		]
 	},
-	{
-		name: 'Internals',
-		path: '/docs/internals',
-		children: [
-			{ name: 'Storage Bindings', path: '/docs/internals/storage' }
-		]
-	}
 ];

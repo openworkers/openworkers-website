@@ -28,13 +28,7 @@
   });
 
   function isActive(item: NavItem): boolean {
-    const currentPath = page.url.pathname;
-
-    if (item.path === '/docs') {
-      return currentPath === '/docs';
-    }
-
-    return currentPath === item.path || currentPath.startsWith(item.path + '/');
+    return page.url.pathname === item.path;
   }
 
   const ghEditUrl = $derived(() => {
