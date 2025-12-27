@@ -34,8 +34,3 @@ addEventListener('fetch', (event: FetchEvent) => {
 When your environment variable is correctly set, the [online editor](/docs/online-editor) is able to autocomplete the variable name.
 
 ![Autocomplete](/images/environment-completion.png)
-
-## Future Work
-
-- [x] Add support for secrets
-- [ ] Mergeable environments: allow to merge environment variables from different environments sets

@@ -52,7 +52,8 @@ export const docsNav: NavItem[] = [
 		path: '/docs/architecture',
 		children: [
 			{ name: 'Overview', path: '/docs/architecture' },
-			{ name: 'Bindings', path: '/docs/architecture/bindings' }
+			{ name: 'Bindings', path: '/docs/architecture/bindings' },
+			{ name: 'HTTP Flow', path: '/docs/architecture/http-flow' }
 		]
 	}
 ];
