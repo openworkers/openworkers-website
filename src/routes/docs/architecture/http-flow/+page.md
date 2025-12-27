@@ -4,12 +4,12 @@ This document details how HTTP requests flow through OpenWorkers, from incoming 
 
 ## Quick Summary
 
-| Direction | Body Handling | Why |
-|-----------|---------------|-----|
-| **Incoming request** | Buffered | Actix buffers before handler; 99% are small JSON |
-| **Outgoing fetch** | Buffered | Request body must be complete before sending |
-| **Fetch response** | Streaming | Uses `reqwest::bytes_stream()` |
-| **Worker response** | Streaming | Via bounded MPSC channels |
+| Direction            | Body Handling | Why                                              |
+| -------------------- | ------------- | ------------------------------------------------ |
+| **Incoming request** | Buffered      | Actix buffers before handler; 99% are small JSON |
+| **Outgoing fetch**   | Buffered      | Request body must be complete before sending     |
+| **Fetch response**   | Streaming     | Uses `reqwest::bytes_stream()`                   |
+| **Worker response**  | Streaming     | Via bounded MPSC channels                        |
 
 ## Request Types
 
@@ -32,6 +32,7 @@ pub enum RequestBody {
 **Design decision:** Input bodies are always fully buffered. No streaming input.
 
 **Rationale:**
+
 - 99% of requests are small JSON payloads
 - HTTP servers buffer bodies before passing to handlers
 - Streaming input adds significant complexity
@@ -202,20 +203,20 @@ pub enum ResponseBody {
 
 ### Where Streaming Works
 
-| Use Case | Supported | Notes |
-|----------|-----------|-------|
-| SSE (Server-Sent Events) | ✅ | Response streams to client |
-| Large file download | ✅ | Fetch response → client |
-| Chunked API responses | ✅ | Progressive JSON, etc. |
-| Proxy pass-through | ✅ | Fetch → forward to client |
+| Use Case                 | Supported | Notes                      |
+| ------------------------ | --------- | -------------------------- |
+| SSE (Server-Sent Events) | ✅        | Response streams to client |
+| Large file download      | ✅        | Fetch response → client    |
+| Chunked API responses    | ✅        | Progressive JSON, etc.     |
+| Proxy pass-through       | ✅        | Fetch → forward to client  |
 
 ### Where Streaming Does NOT Work
 
-| Use Case | Supported | Workaround |
-|----------|-----------|------------|
-| Large file upload | ❌ | Use presigned S3 URLs |
-| Streaming POST body | ❌ | Buffer in client first |
-| WebSocket | ❌ | Not implemented yet |
+| Use Case            | Supported | Workaround             |
+| ------------------- | --------- | ---------------------- |
+| Large file upload   | ❌        | Use presigned S3 URLs  |
+| Streaming POST body | ❌        | Buffer in client first |
+| WebSocket           | ❌        | Not implemented yet    |
 
 ### Backpressure
 
@@ -269,13 +270,13 @@ This balances latency (fast initial polling) with CPU usage (slower later).
 
 ## Key Files
 
-| File | Purpose |
-|------|---------|
-| `openworkers-core/src/http.rs` | HttpRequest, HttpResponse, RequestBody, ResponseBody |
-| `openworkers-runner/src/ops.rs` | `do_fetch()` with reqwest streaming |
-| `openworkers-runtime-v8/src/worker.rs` | V8 worker, response extraction |
-| `openworkers-runtime-v8/src/runtime/mod.rs` | Event loop, stream forwarding |
-| `openworkers-runtime-v8/src/runtime/stream_manager.rs` | Bounded channel coordination |
+| File                                                   | Purpose                                              |
+| ------------------------------------------------------ | ---------------------------------------------------- |
+| `openworkers-core/src/http.rs`                         | HttpRequest, HttpResponse, RequestBody, ResponseBody |
+| `openworkers-runner/src/ops.rs`                        | `do_fetch()` with reqwest streaming                  |
+| `openworkers-runtime-v8/src/worker.rs`                 | V8 worker, response extraction                       |
+| `openworkers-runtime-v8/src/runtime/mod.rs`            | Event loop, stream forwarding                        |
+| `openworkers-runtime-v8/src/runtime/stream_manager.rs` | Bounded channel coordination                         |
 
 ---
 
@@ -286,8 +287,8 @@ This balances latency (fast initial polling) with CPU usage (slower later).
 ```javascript
 // This works, but body is fully buffered first
 addEventListener('fetch', async (event) => {
-    const body = await event.request.text();  // Already buffered
-    // ...
+  const body = await event.request.text(); // Already buffered
+  // ...
 });
 ```
 
@@ -298,8 +299,8 @@ For large uploads, use presigned S3 URLs instead.
 ```javascript
 // Body must be complete before fetch sends
 await fetch('https://api.example.com/upload', {
-    method: 'POST',
-    body: largeData  // Buffered, then sent
+  method: 'POST',
+  body: largeData // Buffered, then sent
 });
 ```
 
@@ -318,7 +319,7 @@ return new Response(await fetch(...).then(r => r.text()));
 ```javascript
 // ✅ Efficient: streams through without buffering
 addEventListener('fetch', async (event) => {
-    const upstream = await fetch('https://cdn.example.com/large-file');
-    event.respondWith(upstream);  // Streams directly
+  const upstream = await fetch('https://cdn.example.com/large-file');
+  event.respondWith(upstream); // Streams directly
 });
 ```

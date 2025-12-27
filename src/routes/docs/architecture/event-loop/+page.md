@@ -4,10 +4,10 @@ This document describes how the V8 runtime communicates with the Rust event loop
 
 ## Quick Summary
 
-| Direction | Channel | Purpose |
-|-----------|---------|---------|
-| **JS → Rust** | `SchedulerMessage` | Request async operations |
-| **Rust → JS** | `CallbackMessage` | Return results to callbacks |
+| Direction     | Channel            | Purpose                     |
+| ------------- | ------------------ | --------------------------- |
+| **JS → Rust** | `SchedulerMessage` | Request async operations    |
+| **Rust → JS** | `CallbackMessage`  | Return results to callbacks |
 
 ---
 
@@ -135,8 +135,8 @@ const response = await fetch('https://api.example.com');
 
 // Internally becomes:
 __nativeFetchStreaming(request, (result) => {
-    // This callback is stored and invoked later
-    resolve(result);
+  // This callback is stored and invoked later
+  resolve(result);
 });
 ```
 
@@ -336,6 +336,7 @@ pub enum Operation {
 ```
 
 This allows the Runner to:
+
 - Inject credentials for bindings
 - Apply rate limits
 - Log operations
@@ -345,12 +346,12 @@ This allows the Runner to:
 
 ## Key Files
 
-| File | Purpose |
-|------|---------|
-| `openworkers-runtime-v8/src/runtime/mod.rs` | Runtime struct, event loop, process_callbacks |
-| `openworkers-runtime-v8/src/runtime/bindings/` | Native V8 functions |
-| `openworkers-runtime-v8/src/runtime/stream_manager.rs` | Stream coordination |
-| `openworkers-core/src/ops.rs` | Operation, OperationResult enums |
+| File                                                   | Purpose                                       |
+| ------------------------------------------------------ | --------------------------------------------- |
+| `openworkers-runtime-v8/src/runtime/mod.rs`            | Runtime struct, event loop, process_callbacks |
+| `openworkers-runtime-v8/src/runtime/bindings/`         | Native V8 functions                           |
+| `openworkers-runtime-v8/src/runtime/stream_manager.rs` | Stream coordination                           |
+| `openworkers-core/src/ops.rs`                          | Operation, OperationResult enums              |
 
 ---
 

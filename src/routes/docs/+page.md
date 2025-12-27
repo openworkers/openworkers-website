@@ -61,4 +61,3 @@ async function handleRequest(request: Request): Promise<Response> {
 ```
 
 From now on, you can edit the code of the worker and it will be automatically deployed.
-

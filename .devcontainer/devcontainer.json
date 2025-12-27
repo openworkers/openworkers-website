@@ -1,18 +1,18 @@
 {
-    "forwardPorts": [4300],
-    "postCreateCommand": "npm i",
-    "customizations": {
-        "vscode": {
-            "settings": {
-                "terminal.integrated.defaultProfile.linux": "zsh",
-                "extensions.ignoreRecommendations": true
-            },
-            "extensions": [
-                "angular.ng-template",
-                "formulahendry.auto-rename-tag",
-                "esbenp.prettier-vscode",
-                "bradlc.vscode-tailwindcss"
-            ]
-        }
+  "forwardPorts": [4300],
+  "postCreateCommand": "npm i",
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "zsh",
+        "extensions.ignoreRecommendations": true
+      },
+      "extensions": [
+        "angular.ng-template",
+        "formulahendry.auto-rename-tag",
+        "esbenp.prettier-vscode",
+        "bradlc.vscode-tailwindcss"
+      ]
     }
+  }
 }

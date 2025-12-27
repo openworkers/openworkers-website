@@ -28,13 +28,13 @@ Bindings connect workers to external resources without exposing credentials. The
 
 ## Binding Types
 
-| Type | Description | Backend |
-|------|-------------|---------|
-| `var` | Environment variable | In-memory |
-| `secret` | Hidden variable | In-memory |
-| `assets` | Static files (read-only) | S3/R2 |
-| `storage` | Blob storage (read/write) | S3/R2 |
-| `kv` | Key-value with TTL | PostgreSQL |
+| Type      | Description               | Backend    |
+| --------- | ------------------------- | ---------- |
+| `var`     | Environment variable      | In-memory  |
+| `secret`  | Hidden variable           | In-memory  |
+| `assets`  | Static files (read-only)  | S3/R2      |
+| `storage` | Blob storage (read/write) | S3/R2      |
+| `kv`      | Key-value with TTL        | PostgreSQL |
 
 ## Database Schema
 
@@ -114,29 +114,29 @@ Bindings are injected as native V8 functions:
 
 ```javascript
 // Generated JS for KV binding
-env.KV = (function() {
-    const __bindingName = "KV";
-    return {
-        get: function(key) {
-            return new Promise((resolve, reject) => {
-                __nativeBindingKv(__bindingName, 'get', { key }, (result) => {
-                    if (!result.success) reject(new Error(result.error));
-                    else resolve(result.value);
-                });
-            });
-        },
-        put: function(key, value, options) {
-            return new Promise((resolve, reject) => {
-                const params = { key, value };
-                if (options?.expiresIn) params.expiresIn = options.expiresIn;
-                __nativeBindingKv(__bindingName, 'put', params, (result) => {
-                    if (!result.success) reject(new Error(result.error));
-                    else resolve();
-                });
-            });
-        },
-        // delete, list...
-    };
+env.KV = (function () {
+  const __bindingName = 'KV';
+  return {
+    get: function (key) {
+      return new Promise((resolve, reject) => {
+        __nativeBindingKv(__bindingName, 'get', { key }, (result) => {
+          if (!result.success) reject(new Error(result.error));
+          else resolve(result.value);
+        });
+      });
+    },
+    put: function (key, value, options) {
+      return new Promise((resolve, reject) => {
+        const params = { key, value };
+        if (options?.expiresIn) params.expiresIn = options.expiresIn;
+        __nativeBindingKv(__bindingName, 'put', params, (result) => {
+          if (!result.success) reject(new Error(result.error));
+          else resolve();
+        });
+      });
+    }
+    // delete, list...
+  };
 })();
 ```
 
@@ -193,12 +193,13 @@ Workers cannot access credentials:
 **Storage/Assets:** Prefix-scoped S3 tokens
 
 ```yaml
-bucket: "openworkers-shared"
-prefix: "tenant_abc123/"
+bucket: 'openworkers-shared'
+prefix: 'tenant_abc123/'
 token: <prefix-scoped-token>
 ```
 
 Both AWS S3 and Cloudflare R2 support prefix-scoped tokens:
+
 - **AWS S3:** IAM policies with `Resource: "arn:aws:s3:::bucket/prefix/*"`
 - **Cloudflare R2:** API tokens with prefix restrictions
 
@@ -253,9 +254,9 @@ KV: (function() {
 
 Current KV uses PostgreSQL (~5ms latency). For better performance:
 
-| Backend | Latency | Notes |
-|---------|---------|-------|
-| PostgreSQL | ~5ms | Current, durable |
+| Backend          | Latency | Notes                 |
+| ---------------- | ------- | --------------------- |
+| PostgreSQL       | ~5ms    | Current, durable      |
 | fjall (embedded) | ~0.01ms | Pure Rust, native TTL |
 
 Trade-off: Embedded storage is local to runner (no multi-runner sharing).

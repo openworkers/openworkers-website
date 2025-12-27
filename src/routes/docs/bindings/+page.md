@@ -7,8 +7,8 @@ Bindings connect your worker to external resources. They're injected via the `en
 Environment variables for configuration.
 
 ```javascript
-const apiUrl = env.API_URL;        // Variable (visible)
-const apiKey = env.API_KEY;        // Secret (hidden in logs)
+const apiUrl = env.API_URL; // Variable (visible)
+const apiKey = env.API_KEY; // Secret (hidden in logs)
 ```
 
 Configure in **Environments** in the dashboard.
@@ -19,11 +19,11 @@ See [Environment Variables](/docs/environment-variables) for setup.
 
 ## Resource Bindings
 
-| Binding | Access | Description |
-|---------|--------|-------------|
-| [Storage](/docs/bindings/storage) | Read/Write | Blob storage (S3/R2) with `get`, `put`, `head`, `list`, `delete` |
-| [KV](/docs/bindings/kv) | Read/Write | Key-value store with TTL support |
-| [Database](/docs/bindings/database) | Read/Write | SQL database (coming soon) |
+| Binding                             | Access     | Description                                                      |
+| ----------------------------------- | ---------- | ---------------------------------------------------------------- |
+| [Storage](/docs/bindings/storage)   | Read/Write | Blob storage (S3/R2) with `get`, `put`, `head`, `list`, `delete` |
+| [KV](/docs/bindings/kv)             | Read/Write | Key-value store with TTL support                                 |
+| [Database](/docs/bindings/database) | Read/Write | SQL database (coming soon)                                       |
 
 ---
 

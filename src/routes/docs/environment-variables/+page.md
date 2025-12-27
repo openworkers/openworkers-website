@@ -2,12 +2,11 @@
 
 Environment variables are key-value pairs that are passed to the worker when it starts, you can use it to pass sensitive information to the worker.
 
-
 ![Environment variables](/images/environment-variables.png)
 
 ## Setting Environment Variables
 
-Environment variables can be set in the "Environments" tab. 
+Environment variables can be set in the "Environments" tab.
 
 Click on "Add Environment" to create a new environment set.
 
@@ -25,9 +24,7 @@ You can access environment variables in your worker using the `env` global objec
 addEventListener('fetch', (event: FetchEvent) => {
   const name = env.NAME;
 
-  event.respondWith(
-      new Response(`Hello, ${name}!`)
-  );
+  event.respondWith(new Response(`Hello, ${name}!`));
 });
 ```
 

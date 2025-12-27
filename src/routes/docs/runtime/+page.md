@@ -30,15 +30,15 @@ const request = new Request('https://example.com', {
 });
 
 // Properties
-request.method     // 'POST'
-request.url        // 'https://example.com'
-request.headers    // Headers object
+request.method; // 'POST'
+request.url; // 'https://example.com'
+request.headers; // Headers object
 
 // Body methods
-await request.text()        // Read as string
-await request.json()        // Parse as JSON
-await request.arrayBuffer() // Read as ArrayBuffer
-await request.formData()    // Parse as FormData
+await request.text(); // Read as string
+await request.json(); // Parse as JSON
+await request.arrayBuffer(); // Read as ArrayBuffer
+await request.formData(); // Parse as FormData
 
 // Clone (useful when body needs to be read multiple times)
 const clone = request.clone();
@@ -57,16 +57,16 @@ new Response(JSON.stringify({ ok: true }), {
 });
 
 // Properties
-response.status      // 200
-response.statusText  // 'OK'
-response.ok          // true (status 200-299)
-response.headers     // Headers object
+response.status; // 200
+response.statusText; // 'OK'
+response.ok; // true (status 200-299)
+response.headers; // Headers object
 
 // Body methods
-await response.text()
-await response.json()
-await response.arrayBuffer()
-await response.formData()
+await response.text();
+await response.json();
+await response.arrayBuffer();
+await response.formData();
 ```
 
 ### Headers
@@ -79,8 +79,8 @@ const headers = new Headers({
 
 headers.set('Authorization', 'Bearer token');
 headers.append('Accept', 'application/json');
-headers.get('Content-Type');  // 'application/json'
-headers.has('X-Custom');      // true
+headers.get('Content-Type'); // 'application/json'
+headers.has('X-Custom'); // true
 headers.delete('X-Custom');
 
 // Iterate
@@ -100,26 +100,26 @@ Parse and manipulate URLs.
 ```javascript
 const url = new URL('https://example.com:8080/path?foo=bar#hash');
 
-url.protocol   // 'https:'
-url.host       // 'example.com:8080'
-url.hostname   // 'example.com'
-url.port       // '8080'
-url.pathname   // '/path'
-url.search     // '?foo=bar'
-url.hash       // '#hash'
-url.origin     // 'https://example.com:8080'
+url.protocol; // 'https:'
+url.host; // 'example.com:8080'
+url.hostname; // 'example.com'
+url.port; // '8080'
+url.pathname; // '/path'
+url.search; // '?foo=bar'
+url.hash; // '#hash'
+url.origin; // 'https://example.com:8080'
 
 // Modify
 url.pathname = '/new-path';
 url.searchParams.set('key', 'value');
-url.href  // 'https://example.com:8080/new-path?foo=bar&key=value#hash'
+url.href; // 'https://example.com:8080/new-path?foo=bar&key=value#hash'
 ```
 
 Relative URLs with base:
 
 ```javascript
 const url = new URL('/api/users', 'https://example.com');
-url.href  // 'https://example.com/api/users'
+url.href; // 'https://example.com/api/users'
 ```
 
 ### URLSearchParams
@@ -127,13 +127,13 @@ url.href  // 'https://example.com/api/users'
 ```javascript
 const params = new URLSearchParams('foo=1&bar=2');
 
-params.get('foo')      // '1'
-params.getAll('foo')   // ['1']
-params.has('bar')      // true
-params.set('foo', '3')
-params.append('baz', '4')
-params.delete('bar')
-params.toString()      // 'foo=3&baz=4'
+params.get('foo'); // '1'
+params.getAll('foo'); // ['1']
+params.has('bar'); // true
+params.set('foo', '3');
+params.append('baz', '4');
+params.delete('bar');
+params.toString(); // 'foo=3&baz=4'
 
 // From object
 const params2 = new URLSearchParams({ a: '1', b: '2' });
@@ -172,10 +172,10 @@ const text = decoder.decode(new Uint8Array([72, 101, 108, 108, 111]));
 
 ```javascript
 // Encode string to base64
-const encoded = btoa('Hello World');  // 'SGVsbG8gV29ybGQ='
+const encoded = btoa('Hello World'); // 'SGVsbG8gV29ybGQ='
 
 // Decode base64 to string
-const decoded = atob('SGVsbG8gV29ybGQ=');  // 'Hello World'
+const decoded = atob('SGVsbG8gV29ybGQ='); // 'Hello World'
 ```
 
 ---
@@ -189,12 +189,12 @@ Immutable raw binary data.
 ```javascript
 const blob = new Blob(['Hello ', 'World'], { type: 'text/plain' });
 
-blob.size  // 11
-blob.type  // 'text/plain'
+blob.size; // 11
+blob.type; // 'text/plain'
 
-await blob.text()         // 'Hello World'
-await blob.arrayBuffer()  // ArrayBuffer
-blob.slice(0, 5)          // New Blob with 'Hello'
+await blob.text(); // 'Hello World'
+await blob.arrayBuffer(); // ArrayBuffer
+blob.slice(0, 5); // New Blob with 'Hello'
 ```
 
 ### File
@@ -207,8 +207,8 @@ const file = new File(['content'], 'file.txt', {
   lastModified: Date.now()
 });
 
-file.name          // 'file.txt'
-file.lastModified  // timestamp
+file.name; // 'file.txt'
+file.lastModified; // timestamp
 ```
 
 ### FormData
@@ -220,10 +220,10 @@ const form = new FormData();
 form.append('name', 'John');
 form.append('file', new Blob(['data']), 'file.txt');
 
-form.get('name')       // 'John'
-form.getAll('name')    // ['John']
-form.has('file')       // true
-form.delete('name')
+form.get('name'); // 'John'
+form.getAll('name'); // ['John']
+form.has('file'); // true
+form.delete('name');
 
 // Iterate
 for (const [key, value] of form) {
@@ -237,7 +237,7 @@ Parse incoming form data:
 addEventListener('fetch', async (event) => {
   const form = await event.request.formData();
   const name = form.get('name');
-  const file = form.get('file');  // File object
+  const file = form.get('file'); // File object
 });
 ```
 
@@ -272,7 +272,7 @@ const stream = new ReadableStream({
 
     for (let i = 0; i < 5; i++) {
       controller.enqueue(encoder.encode(`data: Message ${i}\n\n`));
-      await new Promise(r => setTimeout(r, 1000));
+      await new Promise((r) => setTimeout(r, 1000));
     }
 
     controller.close();
@@ -315,7 +315,7 @@ const [stream1, stream2] = stream.tee();
 
 ```javascript
 // Generate random UUID
-crypto.randomUUID()  // 'f47ac10b-58cc-4372-a567-0e02b2c3d479'
+crypto.randomUUID(); // 'f47ac10b-58cc-4372-a567-0e02b2c3d479'
 
 // Fill array with random bytes
 const array = new Uint8Array(16);
@@ -332,7 +332,7 @@ const hash = await crypto.subtle.digest('SHA-256', data);
 
 // Convert to hex
 const hashArray = Array.from(new Uint8Array(hash));
-const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+const hashHex = hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
 ```
 
 Supported algorithms: `SHA-1`, `SHA-256`, `SHA-384`, `SHA-512`.
@@ -345,13 +345,7 @@ const keyData = encoder.encode('secret-key');
 const data = encoder.encode('message to sign');
 
 // Import key
-const key = await crypto.subtle.importKey(
-  'raw',
-  keyData,
-  { name: 'HMAC', hash: 'SHA-256' },
-  false,
-  ['sign', 'verify']
-);
+const key = await crypto.subtle.importKey('raw', keyData, { name: 'HMAC', hash: 'SHA-256' }, false, ['sign', 'verify']);
 
 // Sign
 const signature = await crypto.subtle.sign('HMAC', key, data);
@@ -370,14 +364,14 @@ const timeoutId = setTimeout(() => {
   console.log('Executed after 1 second');
 }, 1000);
 
-clearTimeout(timeoutId);  // Cancel
+clearTimeout(timeoutId); // Cancel
 
 // Execute repeatedly
 const intervalId = setInterval(() => {
   console.log('Every 500ms');
 }, 500);
 
-clearInterval(intervalId);  // Cancel
+clearInterval(intervalId); // Cancel
 
 // Queue microtask
 queueMicrotask(() => {
@@ -436,7 +430,7 @@ const original = { nested: { value: 42 }, array: [1, 2, 3] };
 const clone = structuredClone(original);
 
 clone.nested.value = 100;
-original.nested.value  // Still 42
+original.nested.value; // Still 42
 ```
 
 ### performance.now()
@@ -453,9 +447,9 @@ console.log(`Took ${duration}ms`);
 ### Global aliases
 
 ```javascript
-globalThis  // The global object
-self        // Alias (Web Worker compatibility)
-global      // Alias (Node.js compatibility)
+globalThis; // The global object
+self; // Alias (Web Worker compatibility)
+global; // Alias (Node.js compatibility)
 ```
 
 ---

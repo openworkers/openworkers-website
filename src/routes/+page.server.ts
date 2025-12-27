@@ -11,15 +11,15 @@ async function handleRequest(request: Request) {
 }`;
 
 export async function load() {
-	const highlighter = await createHighlighter({
-		themes: ['github-light'],
-		langs: ['typescript']
-	});
+  const highlighter = await createHighlighter({
+    themes: ['github-light'],
+    langs: ['typescript']
+  });
 
-	const codeHtml = highlighter.codeToHtml(code, {
-		lang: 'typescript',
-		theme: 'github-light'
-	});
+  const codeHtml = highlighter.codeToHtml(code, {
+    lang: 'typescript',
+    theme: 'github-light'
+  });
 
-	return { codeHtml };
+  return { codeHtml };
 }

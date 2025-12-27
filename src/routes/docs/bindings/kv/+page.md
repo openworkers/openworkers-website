@@ -44,8 +44,8 @@ await env.KV.put('user:123', JSON.stringify({ name: 'John', role: 'admin' }));
 await env.KV.put('session:abc', 'data', { expiresIn: 3600 }); // Expires in 1 hour
 ```
 
-| Option | Type | Description |
-|--------|------|-------------|
+| Option      | Type     | Description                                                                 |
+| ----------- | -------- | --------------------------------------------------------------------------- |
 | `expiresIn` | `number` | Time-to-live in seconds. Key will be automatically deleted after this time. |
 
 > **Note:** Updating a key without `expiresIn` removes any existing expiration.
@@ -73,10 +73,10 @@ const userKeys = await env.KV.list({ prefix: 'user:' });
 const firstTen = await env.KV.list({ limit: 10 });
 ```
 
-| Option | Type | Description |
-|--------|------|-------------|
-| `prefix` | `string` | Only return keys starting with this prefix. |
-| `limit` | `number` | Maximum number of keys to return (default: 1000). |
+| Option   | Type     | Description                                       |
+| -------- | -------- | ------------------------------------------------- |
+| `prefix` | `string` | Only return keys starting with this prefix.       |
+| `limit`  | `number` | Maximum number of keys to return (default: 1000). |
 
 ---
 
@@ -110,7 +110,7 @@ addEventListener('fetch', async (event) => {
 ### Feature flags
 
 ```javascript
-const flags = JSON.parse(await env.KV.get('feature-flags') || '{}');
+const flags = JSON.parse((await env.KV.get('feature-flags')) || '{}');
 
 if (flags.newCheckout) {
   // Show new checkout flow
@@ -122,7 +122,7 @@ if (flags.newCheckout) {
 ```javascript
 const ip = event.request.headers.get('CF-Connecting-IP');
 const key = `ratelimit:${ip}`;
-const count = parseInt(await env.KV.get(key) || '0');
+const count = parseInt((await env.KV.get(key)) || '0');
 
 if (count > 100) {
   event.respondWith(new Response('Too many requests', { status: 429 }));
@@ -152,22 +152,22 @@ for (const key of sessions) {
 
 ## Limits
 
-| Limit | Value |
-|-------|-------|
-| Key size | 512 bytes |
-| Value size | 25 MB |
+| Limit              | Value     |
+| ------------------ | --------- |
+| Key size           | 512 bytes |
+| Value size         | 25 MB     |
 | Keys per namespace | Unlimited |
 
 ---
 
 ## KV vs Storage
 
-| Feature | KV | Storage |
-|---------|-----|---------|
-| Data model | Key-value pairs | Files/blobs |
-| Latency | Low (~ms) | Medium (~100ms) |
-| Max value | 25 MB | Unlimited |
-| Expiration | Built-in TTL | Manual |
-| Use case | Cache, sessions, config | Files, uploads, backups |
+| Feature    | KV                      | Storage                 |
+| ---------- | ----------------------- | ----------------------- |
+| Data model | Key-value pairs         | Files/blobs             |
+| Latency    | Low (~ms)               | Medium (~100ms)         |
+| Max value  | 25 MB                   | Unlimited               |
+| Expiration | Built-in TTL            | Manual                  |
+| Use case   | Cache, sessions, config | Files, uploads, backups |
 
 Use **KV** for small, frequently accessed data with optional expiration. Use **Storage** for larger files or binary data.

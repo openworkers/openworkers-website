@@ -31,7 +31,7 @@ This is the maximum time a worker can run, including all waiting time.
 
 ```javascript
 // This will timeout after 60 seconds
-await new Promise(resolve => setTimeout(resolve, 120_000)); // 2 minutes
+await new Promise((resolve) => setTimeout(resolve, 120_000)); // 2 minutes
 ```
 
 **When exceeded:** Returns `408 Request Timeout` with header `X-Termination-Reason: WallClockTimeout`
@@ -41,6 +41,7 @@ await new Promise(resolve => setTimeout(resolve, 120_000)); // 2 minutes
 ## Memory
 
 **Limits:**
+
 - Initial heap: 1 MB
 - Maximum heap: 128 MB
 
@@ -63,18 +64,18 @@ for (let i = 0; i < 10_000_000; i++) {
 
 When a worker is terminated due to resource limits, the response includes:
 
-| Header | Description |
-|--------|-------------|
+| Header                 | Description               |
+| ---------------------- | ------------------------- |
 | `X-Termination-Reason` | Why the worker was killed |
 
 Possible values:
 
-| Value | HTTP Status | Meaning |
-|-------|-------------|---------|
-| `CpuTimeLimit` | 429 | Exceeded 100ms CPU time |
-| `WallClockTimeout` | 408 | Exceeded 60s total time |
-| `MemoryLimit` | 503 | Exceeded memory allocation |
-| `Exception` | 500 | Unhandled JavaScript error |
+| Value              | HTTP Status | Meaning                    |
+| ------------------ | ----------- | -------------------------- |
+| `CpuTimeLimit`     | 429         | Exceeded 100ms CPU time    |
+| `WallClockTimeout` | 408         | Exceeded 60s total time    |
+| `MemoryLimit`      | 503         | Exceeded memory allocation |
+| `Exception`        | 500         | Unhandled JavaScript error |
 
 ---
 
@@ -92,7 +93,8 @@ fibonacci(45); // Will timeout
 
 // Good - use memoization or iterative approach
 function fibonacciIterative(n) {
-  let a = 0, b = 1;
+  let a = 0,
+    b = 1;
 
   for (let i = 0; i < n; i++) {
     [a, b] = [b, a + b];
@@ -177,10 +179,10 @@ return new Response(stream, {
 
 ## Limits Summary
 
-| Resource | Limit | On Exceed |
-|----------|-------|-----------|
-| CPU Time | 100ms | 429 |
-| Wall Clock | 60s | 408 |
-| Memory | 128 MB | 503 |
+| Resource   | Limit  | On Exceed |
+| ---------- | ------ | --------- |
+| CPU Time   | 100ms  | 429       |
+| Wall Clock | 60s    | 408       |
+| Memory     | 128 MB | 503       |
 
 These limits apply to both `fetch` events (HTTP requests) and `scheduled` events (cron jobs).

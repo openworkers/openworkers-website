@@ -5,9 +5,9 @@ To handle HTTP requests, you need to listen for the `fetch` event. This event is
 ## Fetch event
 
 The `fetch` event provides the following properties and methods:
- - `request`: The [Request object](https://developer.mozilla.org/en-US/docs/Web/API/Request) representing the incoming request.
- - `respondWith`: A callback to send the [Response object](https://developer.mozilla.org/en-US/docs/Web/API/Request).
 
+- `request`: The [Request object](https://developer.mozilla.org/en-US/docs/Web/API/Request) representing the incoming request.
+- `respondWith`: A callback to send the [Response object](https://developer.mozilla.org/en-US/docs/Web/API/Request).
 
 ```typescript
 interface FetchEvent {
@@ -17,12 +17,10 @@ interface FetchEvent {
 ```
 
 ## Example
+
 ```typescript
 addEventListener('fetch', (event: FetchEvent) => {
-  event.respondWith(
-    handleRequest(event.request)
-      .catch((err: Error) => new Response(err.stack, { status: 500 }))
-  );
+  event.respondWith(handleRequest(event.request).catch((err: Error) => new Response(err.stack, { status: 500 })));
 });
 
 async function handleRequest(request: Request): Promise<Response> {
@@ -40,9 +38,7 @@ async function handleRequest(request: Request): Promise<Response> {
 }
 ```
 
-
---------------
-
+---
 
 Let's break down the code:
 
@@ -52,9 +48,7 @@ addEventListener('fetch', (event: FetchEvent) => { ... })
 
 This line listens for the `fetch` event and calls the provided callback function whenever a request is made to the worker.
 
-
---------------
-
+---
 
 ```typescript
 event.respondWith(...)
@@ -62,8 +56,7 @@ event.respondWith(...)
 
 This line tells the worker how to respond to the request. You can respond with a `Response` object, a `Promise<Response>` object, or a `Response` object wrapped in a `Promise`.
 
-
---------------
+---
 
 ```typescript
 handleRequest(request: Request): Promise<Response>

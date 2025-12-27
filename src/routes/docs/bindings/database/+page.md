@@ -8,9 +8,7 @@ SQL database access from your workers.
 
 ```javascript
 addEventListener('fetch', async (event) => {
-  const results = await env.DB.prepare('SELECT * FROM users WHERE id = ?')
-    .bind(1)
-    .all();
+  const results = await env.DB.prepare('SELECT * FROM users WHERE id = ?').bind(1).all();
 
   event.respondWith(
     new Response(JSON.stringify(results), {
@@ -35,8 +33,7 @@ const stmt = env.DB.prepare('SELECT * FROM users WHERE email = ?');
 Bind parameters to a prepared statement.
 
 ```javascript
-const stmt = env.DB.prepare('INSERT INTO users (name, email) VALUES (?, ?)')
-  .bind('John', 'john@example.com');
+const stmt = env.DB.prepare('INSERT INTO users (name, email) VALUES (?, ?)').bind('John', 'john@example.com');
 ```
 
 ### all()
@@ -44,8 +41,7 @@ const stmt = env.DB.prepare('INSERT INTO users (name, email) VALUES (?, ?)')
 Execute query and return all rows.
 
 ```javascript
-const { results } = await env.DB.prepare('SELECT * FROM posts')
-  .all();
+const { results } = await env.DB.prepare('SELECT * FROM posts').all();
 
 // results = [{ id: 1, title: '...' }, { id: 2, title: '...' }]
 ```
@@ -55,9 +51,7 @@ const { results } = await env.DB.prepare('SELECT * FROM posts')
 Execute query and return first row.
 
 ```javascript
-const user = await env.DB.prepare('SELECT * FROM users WHERE id = ?')
-  .bind(1)
-  .first();
+const user = await env.DB.prepare('SELECT * FROM users WHERE id = ?').bind(1).first();
 
 // user = { id: 1, name: 'John', email: '...' }
 ```
@@ -67,9 +61,7 @@ const user = await env.DB.prepare('SELECT * FROM users WHERE id = ?')
 Execute a statement (INSERT, UPDATE, DELETE).
 
 ```javascript
-const { success, meta } = await env.DB.prepare('DELETE FROM sessions WHERE expires < ?')
-  .bind(Date.now())
-  .run();
+const { success, meta } = await env.DB.prepare('DELETE FROM sessions WHERE expires < ?').bind(Date.now()).run();
 
 // meta.changes = number of rows affected
 ```
@@ -82,23 +74,16 @@ const { success, meta } = await env.DB.prepare('DELETE FROM sessions WHERE expir
 
 ```javascript
 // Create
-await env.DB.prepare('INSERT INTO posts (title, body) VALUES (?, ?)')
-  .bind('Hello', 'World')
-  .run();
+await env.DB.prepare('INSERT INTO posts (title, body) VALUES (?, ?)').bind('Hello', 'World').run();
 
 // Read
-const posts = await env.DB.prepare('SELECT * FROM posts')
-  .all();
+const posts = await env.DB.prepare('SELECT * FROM posts').all();
 
 // Update
-await env.DB.prepare('UPDATE posts SET title = ? WHERE id = ?')
-  .bind('Updated', 1)
-  .run();
+await env.DB.prepare('UPDATE posts SET title = ? WHERE id = ?').bind('Updated', 1).run();
 
 // Delete
-await env.DB.prepare('DELETE FROM posts WHERE id = ?')
-  .bind(1)
-  .run();
+await env.DB.prepare('DELETE FROM posts WHERE id = ?').bind(1).run();
 ```
 
 ### Transactions
@@ -117,6 +102,7 @@ const results = await env.DB.batch([
 Databases are created in the dashboard under **Databases**.
 
 Each database provides:
+
 - A unique ID
 - A token for authentication
 - Connection details
@@ -125,11 +111,11 @@ Each database provides:
 
 ## Limits
 
-| Limit | Value |
-|-------|-------|
-| Max query size | 1 MB |
-| Max rows returned | 10,000 |
-| Max concurrent connections | 10 |
+| Limit                      | Value  |
+| -------------------------- | ------ |
+| Max query size             | 1 MB   |
+| Max rows returned          | 10,000 |
+| Max concurrent connections | 10     |
 
 ---
 

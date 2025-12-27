@@ -33,25 +33,25 @@ OpenWorkers supports standard cron expressions with an optional seconds field.
 
 ### Examples
 
-| Expression | Description |
-|------------|-------------|
-| `* * * * *` | Every minute |
-| `*/5 * * * *` | Every 5 minutes |
-| `0 * * * *` | Every hour |
-| `0 0 * * *` | Every day at midnight |
-| `0 9 * * 1` | Every Monday at 9:00 AM |
-| `0 0 1 * *` | First day of every month |
-| `*/30 * * * * *` | Every 30 seconds (6-field) |
-| `0 */5 * * * *` | Every 5 minutes at second 0 (6-field) |
+| Expression       | Description                           |
+| ---------------- | ------------------------------------- |
+| `* * * * *`      | Every minute                          |
+| `*/5 * * * *`    | Every 5 minutes                       |
+| `0 * * * *`      | Every hour                            |
+| `0 0 * * *`      | Every day at midnight                 |
+| `0 9 * * 1`      | Every Monday at 9:00 AM               |
+| `0 0 1 * *`      | First day of every month              |
+| `*/30 * * * * *` | Every 30 seconds (6-field)            |
+| `0 */5 * * * *`  | Every 5 minutes at second 0 (6-field) |
 
 ### Special characters
 
-| Character | Meaning | Example |
-|-----------|---------|---------|
-| `*` | Any value | `* * * * *` (every minute) |
-| `*/n` | Every n units | `*/15 * * * *` (every 15 min) |
-| `n-m` | Range | `0-30 * * * *` (minutes 0-30) |
-| `n,m` | List | `0,30 * * * *` (at 0 and 30) |
+| Character | Meaning       | Example                       |
+| --------- | ------------- | ----------------------------- |
+| `*`       | Any value     | `* * * * *` (every minute)    |
+| `*/n`     | Every n units | `*/15 * * * *` (every 15 min) |
+| `n-m`     | Range         | `0-30 * * * *` (minutes 0-30) |
+| `n,m`     | List          | `0,30 * * * *` (at 0 and 30)  |
 
 ---
 
@@ -61,15 +61,15 @@ When your cron triggers, the worker receives a `scheduled` event.
 
 ```typescript
 interface ScheduledEvent {
-  scheduledTime: number;  // Unix timestamp (ms)
+  scheduledTime: number; // Unix timestamp (ms)
   waitUntil(promise: Promise<any>): void;
 }
 ```
 
-| Property | Description |
-|----------|-------------|
+| Property        | Description                                                         |
+| --------------- | ------------------------------------------------------------------- |
 | `scheduledTime` | When the task was scheduled to run (Unix timestamp in milliseconds) |
-| `waitUntil()` | Keep the worker alive until the promise resolves |
+| `waitUntil()`   | Keep the worker alive until the promise resolves                    |
 
 ---
 
@@ -110,7 +110,7 @@ async function cleanup(): Promise<void> {
   await fetch('https://api.example.com/records/cleanup', {
     method: 'POST',
     headers: {
-      'Authorization': `Bearer ${env.API_TOKEN}`,
+      Authorization: `Bearer ${env.API_TOKEN}`,
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({ before: cutoff })
@@ -161,10 +161,7 @@ addEventListener('scheduled', (event: ScheduledEvent) => {
 });
 
 async function healthCheck(): Promise<void> {
-  const services = [
-    'https://api.example.com/health',
-    'https://app.example.com/health'
-  ];
+  const services = ['https://api.example.com/health', 'https://app.example.com/health'];
 
   for (const url of services) {
     try {
@@ -205,11 +202,11 @@ async function sendAlert(message: string): Promise<void> {
 
 Scheduled tasks have the same limits as HTTP requests:
 
-| Resource | Limit |
-|----------|-------|
-| CPU Time | 100ms |
+| Resource   | Limit      |
+| ---------- | ---------- |
+| CPU Time   | 100ms      |
 | Wall Clock | 60 seconds |
-| Memory | 128 MB |
+| Memory     | 128 MB     |
 
 See [Limits & Quotas](/docs/limits) for details.
 

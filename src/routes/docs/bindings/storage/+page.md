@@ -58,7 +58,7 @@ Write a file. Accepts string or `Uint8Array`.
 await env.STORAGE.put('data/config.json', JSON.stringify({ version: 1 }));
 
 // Binary file
-const bytes = new Uint8Array([0x89, 0x50, 0x4E, 0x47]);
+const bytes = new Uint8Array([0x89, 0x50, 0x4e, 0x47]);
 await env.STORAGE.put('images/icon.png', bytes);
 ```
 
@@ -69,14 +69,14 @@ Get file metadata without downloading the content.
 ```javascript
 const meta = await env.STORAGE.head('uploads/large-file.zip');
 
-console.log(meta.size);  // File size in bytes
-console.log(meta.etag);  // ETag for caching
+console.log(meta.size); // File size in bytes
+console.log(meta.etag); // ETag for caching
 ```
 
-| Property | Type | Description |
-|----------|------|-------------|
-| `size` | `number` | File size in bytes |
-| `etag` | `string` | ETag hash (optional) |
+| Property | Type     | Description          |
+| -------- | -------- | -------------------- |
+| `size`   | `number` | File size in bytes   |
+| `etag`   | `string` | ETag hash (optional) |
 
 ### list(options?)
 
@@ -85,7 +85,7 @@ List files in the storage.
 ```javascript
 // List all files
 const result = await env.STORAGE.list();
-console.log(result.keys);      // Array of file keys
+console.log(result.keys); // Array of file keys
 console.log(result.truncated); // true if more results exist
 
 // With prefix filter
@@ -95,10 +95,10 @@ const uploads = await env.STORAGE.list({ prefix: 'uploads/' });
 const firstTen = await env.STORAGE.list({ limit: 10 });
 ```
 
-| Option | Type | Description |
-|--------|------|-------------|
+| Option   | Type     | Description                                 |
+| -------- | -------- | ------------------------------------------- |
 | `prefix` | `string` | Only return keys starting with this prefix. |
-| `limit` | `number` | Maximum number of keys to return. |
+| `limit`  | `number` | Maximum number of keys to return.           |
 
 ### delete(key)
 
@@ -134,9 +134,11 @@ addEventListener('fetch', async (event) => {
 
   await env.STORAGE.put(key, new Uint8Array(buffer));
 
-  event.respondWith(new Response(JSON.stringify({ key }), {
-    headers: { 'Content-Type': 'application/json' }
-  }));
+  event.respondWith(
+    new Response(JSON.stringify({ key }), {
+      headers: { 'Content-Type': 'application/json' }
+    })
+  );
 });
 ```
 
@@ -210,21 +212,21 @@ Config:
 
 ## Configuration
 
-| Field | Description |
-|-------|-------------|
-| Bucket | S3/R2 bucket name |
-| Prefix | Path prefix for isolation (shared mode) |
-| Endpoint | S3/R2 endpoint URL |
-| Region | AWS region (for S3) |
+| Field    | Description                             |
+| -------- | --------------------------------------- |
+| Bucket   | S3/R2 bucket name                       |
+| Prefix   | Path prefix for isolation (shared mode) |
+| Endpoint | S3/R2 endpoint URL                      |
+| Region   | AWS region (for S3)                     |
 
 ---
 
 ## Assets vs Storage
 
-| Feature | Assets | Storage |
-|---------|--------|---------|
-| Access | Read-only | Read/Write |
+| Feature  | Assets                         | Storage                       |
+| -------- | ------------------------------ | ----------------------------- |
+| Access   | Read-only                      | Read/Write                    |
 | Use case | Static files (images, CSS, JS) | Dynamic files (uploads, data) |
-| API | `env.ASSETS.fetch(path)` | `env.STORAGE.get/put/delete` |
+| API      | `env.ASSETS.fetch(path)`       | `env.STORAGE.get/put/delete`  |
 
 Use **Assets** for static content that doesn't change. Use **Storage** when you need to write or delete files.

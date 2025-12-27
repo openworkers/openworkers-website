@@ -4,14 +4,14 @@ OpenWorkers executes untrusted code in a multi-tenant environment. This document
 
 ## Quick Summary
 
-| Layer | Protection | Default |
-|-------|------------|---------|
-| **Memory** | V8 heap limits + custom ArrayBuffer allocator | 128 MB |
-| **CPU Time** | POSIX timer (Linux) | 50 ms |
-| **Wall Clock** | Watchdog thread | 30 seconds |
-| **Network** | Fetch via operations handler | Controlled |
-| **Filesystem** | Not exposed | Blocked |
-| **Processes** | Not exposed | Blocked |
+| Layer          | Protection                                    | Default    |
+| -------------- | --------------------------------------------- | ---------- |
+| **Memory**     | V8 heap limits + custom ArrayBuffer allocator | 128 MB     |
+| **CPU Time**   | POSIX timer (Linux)                           | 50 ms      |
+| **Wall Clock** | Watchdog thread                               | 30 seconds |
+| **Network**    | Fetch via operations handler                  | Controlled |
+| **Filesystem** | Not exposed                                   | Blocked    |
+| **Processes**  | Not exposed                                   | Blocked    |
 
 ---
 
@@ -95,6 +95,7 @@ Worker terminated with MemoryLimit
 ```
 
 **Implementation details:**
+
 - Uses `AtomicUsize` for lock-free tracking
 - Sequential consistency (`SeqCst`) for strong ordering
 - Rollback on rejection (prevents quota exhaustion)
@@ -131,6 +132,7 @@ Worker terminated with CpuTimeLimit
 ```
 
 **Key properties:**
+
 - Counts ONLY actual CPU cycles
 - I/O waits, network latency, sleep don't count
 - Per-thread timer (accurate for concurrent workers)
@@ -181,12 +183,12 @@ pub enum TerminationReason {
 
 Each reason maps to an HTTP status:
 
-| Reason | HTTP Status |
-|--------|-------------|
-| CpuTimeLimit | 429 Too Many Requests |
-| MemoryLimit | 429 Too Many Requests |
-| WallClockTimeout | 504 Gateway Timeout |
-| Exception | 500 Internal Server Error |
+| Reason           | HTTP Status               |
+| ---------------- | ------------------------- |
+| CpuTimeLimit     | 429 Too Many Requests     |
+| MemoryLimit      | 429 Too Many Requests     |
+| WallClockTimeout | 504 Gateway Timeout       |
+| Exception        | 500 Internal Server Error |
 
 ---
 
@@ -194,17 +196,17 @@ Each reason maps to an HTTP status:
 
 Workers have access to a limited set of Web APIs:
 
-| Category | APIs |
-|----------|------|
-| **Console** | `console.log`, `console.warn`, `console.error`, `console.debug` |
-| **Fetch** | `fetch()` (via operations handler) |
-| **Timers** | `setTimeout`, `setInterval`, `clearTimeout`, `clearInterval` |
-| **Crypto** | `crypto.getRandomValues()`, `crypto.randomUUID()`, `crypto.subtle.*` |
-| **Text** | `TextEncoder`, `TextDecoder`, `btoa()`, `atob()` |
-| **Web APIs** | `Blob`, `File`, `FormData`, `Headers`, `Request`, `Response` |
-| **Streams** | `ReadableStream`, `WritableStream`, `TransformStream` |
-| **URL** | `URL`, `URLSearchParams` |
-| **Performance** | `performance.now()` (100µs precision) |
+| Category        | APIs                                                                 |
+| --------------- | -------------------------------------------------------------------- |
+| **Console**     | `console.log`, `console.warn`, `console.error`, `console.debug`      |
+| **Fetch**       | `fetch()` (via operations handler)                                   |
+| **Timers**      | `setTimeout`, `setInterval`, `clearTimeout`, `clearInterval`         |
+| **Crypto**      | `crypto.getRandomValues()`, `crypto.randomUUID()`, `crypto.subtle.*` |
+| **Text**        | `TextEncoder`, `TextDecoder`, `btoa()`, `atob()`                     |
+| **Web APIs**    | `Blob`, `File`, `FormData`, `Headers`, `Request`, `Response`         |
+| **Streams**     | `ReadableStream`, `WritableStream`, `TransformStream`                |
+| **URL**         | `URL`, `URLSearchParams`                                             |
+| **Performance** | `performance.now()` (100µs precision)                                |
 
 ### Crypto Algorithms
 
@@ -218,14 +220,14 @@ Workers have access to a limited set of Web APIs:
 
 The following are intentionally NOT available:
 
-| Feature | Why Blocked |
-|---------|-------------|
-| **File System** | No `fs`, no disk access |
-| **Child Processes** | No `spawn()`, `exec()` |
-| **Raw Sockets** | No TCP/UDP, only HTTP via fetch |
-| **Module System** | No `require()`, no dynamic imports |
-| **Environment** | No `process.env` (use `env` binding instead) |
-| **System Calls** | Rust boundary prevents libc access |
+| Feature             | Why Blocked                                  |
+| ------------------- | -------------------------------------------- |
+| **File System**     | No `fs`, no disk access                      |
+| **Child Processes** | No `spawn()`, `exec()`                       |
+| **Raw Sockets**     | No TCP/UDP, only HTTP via fetch              |
+| **Module System**   | No `require()`, no dynamic imports           |
+| **Environment**     | No `process.env` (use `env` binding instead) |
+| **System Calls**    | Rust boundary prevents libc access           |
 
 ---
 
@@ -257,6 +259,7 @@ reqwest::Client executes request
 ```
 
 **Configurable controls:**
+
 - DNS blocklist (internal IPs, localhost)
 - Rate limiting per worker
 - Request/response size limits
@@ -283,6 +286,7 @@ Object.defineProperty(globalThis, 'env', {
 ```
 
 **Properties:**
+
 - Cannot be modified by worker code
 - Cannot be deleted
 - Credentials resolved server-side (worker never sees S3 keys, etc.)
@@ -313,24 +317,24 @@ let permit = semaphore.acquire_timeout(10s).await?;
 ```javascript
 // Returns values like: 1234.5, 1234.6, 1234.7
 // NOT: 1234.567891234
-performance.now()
+performance.now();
 ```
 
 ---
 
 ## Threat Model
 
-| Threat | Attack | Protection |
-|--------|--------|------------|
-| **Memory bomb** | Allocate 1GB buffer | ArrayBuffer allocator rejects |
-| **CPU mining** | Infinite loop | CPU timer terminates (50ms) |
-| **Slow loris** | Hold connection forever | Wall-clock timeout (30s) |
-| **Fork bomb** | Spawn processes | No process API exposed |
-| **Disk fill** | Write huge files | No filesystem API exposed |
-| **Network DoS** | Infinite outbound requests | Operations handler controls |
-| **Timing attack** | Measure crypto timing | `performance.now()` rounded |
-| **Code injection** | `eval()` malicious code | Code pre-supplied, eval limited |
-| **Credential theft** | Access S3 keys | Bindings resolve server-side |
+| Threat               | Attack                     | Protection                      |
+| -------------------- | -------------------------- | ------------------------------- |
+| **Memory bomb**      | Allocate 1GB buffer        | ArrayBuffer allocator rejects   |
+| **CPU mining**       | Infinite loop              | CPU timer terminates (50ms)     |
+| **Slow loris**       | Hold connection forever    | Wall-clock timeout (30s)        |
+| **Fork bomb**        | Spawn processes            | No process API exposed          |
+| **Disk fill**        | Write huge files           | No filesystem API exposed       |
+| **Network DoS**      | Infinite outbound requests | Operations handler controls     |
+| **Timing attack**    | Measure crypto timing      | `performance.now()` rounded     |
+| **Code injection**   | `eval()` malicious code    | Code pre-supplied, eval limited |
+| **Credential theft** | Access S3 keys             | Bindings resolve server-side    |
 
 ---
 
@@ -349,11 +353,11 @@ pub struct RuntimeLimits {
 
 ### Environment Variables
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `WORKER_POOL_SIZE` | Thread count | CPU cores |
-| `MAX_WORKERS` | Workers per thread | 10 |
-| `RUNTIME_SNAPSHOT_PATH` | V8 snapshot blob | None |
+| Variable                | Description        | Default   |
+| ----------------------- | ------------------ | --------- |
+| `WORKER_POOL_SIZE`      | Thread count       | CPU cores |
+| `MAX_WORKERS`           | Workers per thread | 10        |
+| `RUNTIME_SNAPSHOT_PATH` | V8 snapshot blob   | None      |
 
 ---
 

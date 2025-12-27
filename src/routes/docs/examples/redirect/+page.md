@@ -84,6 +84,7 @@ async function handleRequest(request: Request): Promise<Response> {
 ```
 
 Then set environment variables:
+
 - `REDIRECT_gh` = `https://github.com/openworkers`
 - `REDIRECT_docs` = `https://openworkers.com/docs`
 
