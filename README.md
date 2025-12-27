@@ -1,30 +1,38 @@
-# OpenWorkers Website
+# sv
 
-This is the source code for the OpenWorkers website. It is built Angular and hosted on GitHub Pages.
+Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
 
-## Development
+## Creating a project
 
-To run the website locally, you need to have Node.js installed. Then, run the following commands:
-npm install
-npm run dev
+If you're seeing this, you've probably already done this step. Congrats!
 
-#### Test dist locally
-```bash
-docker run --rm --name some-nginx \
-  -p 80:80 \
-  -v ${PWD}/dist/browser:/usr/share/nginx/html:ro \
-  -v ${PWD}/nginx.dev.conf:/etc/nginx/nginx.conf:ro \
-  nginx:alpine
+```sh
+# create a new project in the current directory
+npx sv create
+
+# create a new project in my-app
+npx sv create my-app
 ```
 
-## Deployment
+## Developing
 
-The website is [automatically deployed to GitHub Pages](https://github.com/marketplace/actions/deploy-to-github-pages) when changes are pushed to the master branch.
+Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
 
-## Contributing
+```sh
+npm run dev
 
-If you want to contribute to the OpenWorkers documentation, please read the [contributing guidelines](CONTRIBUTING.md).
+# or start the server and open the app in a new browser tab
+npm run dev -- --open
+```
 
-## License
+## Building
 
-The OpenWorkers website is licensed under the [CC BY-SA 4.0 and CC0 1.0 Universal licenses](LICENSE).
+To create a production version of your app:
+
+```sh
+npm run build
+```
+
+You can preview the production build with `npm run preview`.
+
+> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.

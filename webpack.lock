@@ -1,5 +1,0 @@
-{
-  "https://raw.githubusercontent.com/openworkers/redis-fetch-server/main/README.md": { "integrity": "sha512-DeSmLSsbDXV8ao7dNxsuxfnu2DIly/CSXpkEAL7yix/njtWA5YS1Ht30XU/zpQ0P5L3rAhpw1wYQXPs1rY2qHg==", "contentType": "text/plain; charset=utf-8" },
-  "https://raw.githubusercontent.com/openworkers/redis-fetch/main/README.md": { "integrity": "sha512-V6e/lrV7gcGGSd217M6bDmTNhqhzq85O1QKkEBfbDwO5MrceIAW5ZXE2hvoJ7wxxULLUI54uO3zaF3V+hq7x0w==", "contentType": "text/plain; charset=utf-8" },
-  "version": 1
-}
