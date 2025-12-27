@@ -4,6 +4,26 @@
 	const loginUrl = 'https://dash.openworkers.com/sign-in';
 
 	let { data } = $props();
+
+	let email = $state('');
+	let status = $state<'idle' | 'loading' | 'success' | 'error'>('idle');
+
+	async function subscribe(e: SubmitEvent) {
+		e.preventDefault();
+		status = 'loading';
+
+		try {
+			const res = await fetch('https://newsletter.workers.rocks/subscribe', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ email })
+			});
+
+			status = res.ok ? 'success' : 'error';
+		} catch {
+			status = 'error';
+		}
+	}
 </script>
 
 <svelte:head>
@@ -61,40 +81,44 @@
 		<div class="flex w-full flex-col justify-between border-y px-4 py-12 md:flex-row md:py-24">
 			<h4 class="flex items-center py-2">Sign up for our newsletter</h4>
 
-			<form
-				class="flex justify-between gap-4"
-				action="https://newsletter.workers.rocks/subscribe"
-				method="POST"
-			>
-				<div class="relative max-w-[24rem] flex-1 rounded border lg:max-w-[32rem]">
-					<svg
-						xmlns="http://www.w3.org/2000/svg"
-						fill="none"
-						viewBox="0 0 24 24"
-						stroke-width="1.5"
-						stroke="currentColor"
-						class="absolute top-1/2 mx-2 h-6 w-6 translate-y-[-50%] text-slate-400"
-					>
-						<path
-							stroke-linecap="round"
-							d="M16.5 12a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zm0 0c0 1.657 1.007 3 2.25 3S21 13.657 21 12a9 9 0 10-2.636 6.364M16.5 12V8.25"
+			{#if status === 'success'}
+				<p class="text-green-600">Subscribed!</p>
+			{:else}
+				<form class="flex justify-between gap-4" onsubmit={subscribe}>
+					<div class="relative max-w-[24rem] flex-1 rounded border lg:max-w-[32rem]">
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							fill="none"
+							viewBox="0 0 24 24"
+							stroke-width="1.5"
+							stroke="currentColor"
+							class="absolute top-1/2 mx-2 h-6 w-6 translate-y-[-50%] text-slate-400"
+						>
+							<path
+								stroke-linecap="round"
+								d="M16.5 12a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zm0 0c0 1.657 1.007 3 2.25 3S21 13.657 21 12a9 9 0 10-2.636 6.364M16.5 12V8.25"
+							/>
+						</svg>
+
+						<input
+							class="h-full w-full pr-4 pl-10 lg:min-w-[24rem]"
+							type="email"
+							bind:value={email}
+							autocomplete="email"
+							placeholder="Email"
+							required
 						/>
-					</svg>
+					</div>
 
-					<input
-						class="h-full w-full pr-4 pl-10 lg:min-w-[24rem]"
-						type="email"
-						name="email"
-						autocomplete="email"
-						placeholder="Email"
-						required
-					/>
-				</div>
-
-				<button type="submit" class="btn btn-blue max-w-xs rounded px-4 py-2 text-xl">
-					Subscribe
-				</button>
-			</form>
+					<button
+						type="submit"
+						class="btn btn-blue max-w-xs rounded px-4 py-2 text-xl"
+						disabled={status === 'loading'}
+					>
+						{status === 'loading' ? 'Subscribing...' : 'Subscribe'}
+					</button>
+				</form>
+			{/if}
 		</div>
 	</div>
 
