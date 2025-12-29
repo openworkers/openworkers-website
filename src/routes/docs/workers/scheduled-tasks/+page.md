@@ -57,23 +57,42 @@ OpenWorkers supports standard cron expressions with an optional seconds field.
 
 ## Scheduled Event
 
-When your cron triggers, the worker receives a `scheduled` event.
-
-```typescript
-interface ScheduledEvent {
-  scheduledTime: number; // Unix timestamp (ms)
-  waitUntil(promise: Promise<any>): void;
-}
-```
+When your cron triggers, the worker receives a `scheduled` event with the following properties:
 
 | Property        | Description                                                         |
 | --------------- | ------------------------------------------------------------------- |
 | `scheduledTime` | When the task was scheduled to run (Unix timestamp in milliseconds) |
-| `waitUntil()`   | Keep the worker alive until the promise resolves                    |
 
 ---
 
-## Basic Example
+## ES Modules (recommended)
+
+The modern syntax. Your handler receives `event`, `env`, and `ctx` as arguments.
+
+```typescript
+export default {
+  async scheduled(event: ScheduledEvent, env: Env, ctx: ExecutionContext): Promise<void> {
+    console.log(`Running at ${new Date(event.scheduledTime).toISOString()}`);
+
+    // Access bindings via env
+    await env.DB.query("INSERT INTO logs (time) VALUES ($1)", [event.scheduledTime]);
+  }
+}
+```
+
+### Parameters
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `event` | `ScheduledEvent` | Event object with `scheduledTime` |
+| `env` | `Env` | Object containing environment variables and bindings |
+| `ctx` | `ExecutionContext` | Execution context with `waitUntil()` |
+
+---
+
+## Service Worker (legacy)
+
+The older syntax using `addEventListener`. Still supported for backwards compatibility.
 
 ```typescript
 addEventListener('scheduled', (event: ScheduledEvent) => {
@@ -81,9 +100,19 @@ addEventListener('scheduled', (event: ScheduledEvent) => {
 });
 
 async function handleSchedule(scheduledTime: number): Promise<void> {
-  console.log(`Running scheduled task at ${new Date(scheduledTime).toISOString()}`);
+  console.log(`Running at ${new Date(scheduledTime).toISOString()}`);
 
-  // Your task logic here
+  // Access bindings via globalThis.env
+  await globalThis.env.DB.query("INSERT INTO logs (time) VALUES ($1)", [scheduledTime]);
+}
+```
+
+### ScheduledEvent interface
+
+```typescript
+interface ScheduledEvent {
+  scheduledTime: number;
+  waitUntil(promise: Promise<any>): void;
 }
 ```
 
@@ -100,23 +129,21 @@ Delete old records every day at 3:00 AM.
 ```
 
 ```typescript
-addEventListener('scheduled', (event: ScheduledEvent) => {
-  event.waitUntil(cleanup());
-});
+export default {
+  async scheduled(event, env, ctx) {
+    const cutoff = Date.now() - 30 * 24 * 60 * 60 * 1000; // 30 days ago
 
-async function cleanup(): Promise<void> {
-  const cutoff = Date.now() - 30 * 24 * 60 * 60 * 1000; // 30 days ago
+    await fetch('https://api.example.com/records/cleanup', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${env.API_TOKEN}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ before: cutoff })
+    });
 
-  await fetch('https://api.example.com/records/cleanup', {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${env.API_TOKEN}`,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({ before: cutoff })
-  });
-
-  console.log('Cleanup completed');
+    console.log('Cleanup completed');
+  }
 }
 ```
 
@@ -129,21 +156,19 @@ Sync data from external API every hour.
 ```
 
 ```typescript
-addEventListener('scheduled', (event: ScheduledEvent) => {
-  event.waitUntil(syncData());
-});
+export default {
+  async scheduled(event, env, ctx) {
+    const response = await fetch('https://external-api.com/data');
+    const data = await response.json();
 
-async function syncData(): Promise<void> {
-  const response = await fetch('https://external-api.com/data');
-  const data = await response.json();
+    await fetch('https://api.example.com/import', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
 
-  await fetch('https://api.example.com/import', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data)
-  });
-
-  console.log(`Synced ${data.length} records`);
+    console.log(`Synced ${data.length} records`);
+  }
 }
 ```
 
@@ -156,27 +181,28 @@ Ping your services and alert on failure.
 ```
 
 ```typescript
-addEventListener('scheduled', (event: ScheduledEvent) => {
-  event.waitUntil(healthCheck());
-});
+export default {
+  async scheduled(event, env, ctx) {
+    const services = [
+      'https://api.example.com/health',
+      'https://app.example.com/health'
+    ];
 
-async function healthCheck(): Promise<void> {
-  const services = ['https://api.example.com/health', 'https://app.example.com/health'];
+    for (const url of services) {
+      try {
+        const response = await fetch(url, { method: 'HEAD' });
 
-  for (const url of services) {
-    try {
-      const response = await fetch(url, { method: 'HEAD' });
-
-      if (!response.ok) {
-        await sendAlert(`${url} returned ${response.status}`);
+        if (!response.ok) {
+          await sendAlert(env, `${url} returned ${response.status}`);
+        }
+      } catch (error) {
+        await sendAlert(env, `${url} is unreachable: ${error.message}`);
       }
-    } catch (error) {
-      await sendAlert(`${url} is unreachable: ${error.message}`);
     }
   }
 }
 
-async function sendAlert(message: string): Promise<void> {
+async function sendAlert(env, message) {
   await fetch(env.SLACK_WEBHOOK, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -214,7 +240,7 @@ See [Limits & Quotas](/docs/limits) for details.
 
 ## Tips
 
-- Always use `event.waitUntil()` to ensure async operations complete
+- Use `ctx.waitUntil()` to ensure async operations complete before the worker terminates
 - Log important milestones for debugging
 - Set appropriate timeouts on external API calls
 - Use secrets for API keys and tokens

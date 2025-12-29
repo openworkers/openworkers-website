@@ -295,15 +295,61 @@ Object.defineProperty(globalThis, 'env', {
 
 ## Concurrency Limits
 
-Worker pool prevents resource exhaustion:
+### Sequential Worker Pool
+
+Each worker runs in a V8 isolate, but **V8 isolates cannot safely share a thread**. V8's RAII scopes require strict LIFO ordering that async task interleaving would break.
+
+**Solution:** A sequential worker pool where each thread processes ONE worker at a time:
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  Thread 0          Thread 1          ...        Thread N-1  │
+│  ┌─────────┐      ┌─────────┐                  ┌─────────┐  │
+│  │ Channel │      │ Channel │                  │ Channel │  │
+│  └────┬────┘      └────┬────┘                  └────┬────┘  │
+│       ▼                ▼                            ▼       │
+│  ┌─────────┐      ┌─────────┐                  ┌─────────┐  │
+│  │LocalSet │      │LocalSet │                  │LocalSet │  │
+│  │  + RT   │      │  + RT   │                  │  + RT   │  │
+│  └─────────┘      └─────────┘                  └─────────┘  │
+│       │                │                            │       │
+│  [Task A]          [Task D]                    [Task G]     │
+│  [Task B] queue    [Task E] queue              [Task H]     │
+│  [Task C]          [Task F]                    [Task I]     │
+└─────────────────────────────────────────────────────────────┘
+
+Round-robin distribution: A→0, B→1, C→2, D→0, E→1, ...
+Sequential execution: Each thread runs ONE task at a time
+```
+
+**Configuration:**
 
 ```rust
-// Default configuration
-WORKER_POOL_SIZE = num_cpus        // Thread count
-MAX_WORKERS = 10                    // Workers per thread
-// Total: 80 concurrent workers on 8-core machine
+WORKER_POOL_SIZE = num_cpus        // Thread count (default: CPU cores)
+MAX_QUEUED_WORKERS = pool_size * 10 // Queue depth limit
 
-// Acquisition with timeout
+// Example on 8-core machine:
+// - 8 concurrent workers (one per thread)
+// - Up to 80 queued workers waiting
+```
+
+**Why sequential?**
+
+V8's `HandleScope` and `ContextScope` use RAII pattern - they call `Enter()` on creation and `Exit()` on drop. If multiple isolates run on the same thread via async interleaving, the scope stack gets corrupted:
+
+```
+❌ With async interleaving (broken):
+Thread: Enter(A) → await → Enter(B) → Exit(B) → Exit(A)
+V8 sees: Enter(A) → Enter(B) → Exit(B) → Exit(A) ✗ Wrong order!
+
+✅ With sequential execution (safe):
+Thread: Enter(A) → work → Exit(A) → Enter(B) → work → Exit(B)
+V8 sees: Enter(A) → Exit(A) → Enter(B) → Exit(B) ✓ Correct!
+```
+
+**Semaphore prevents queue explosion:**
+
+```rust
 let permit = semaphore.acquire_timeout(10s).await?;
 // If timeout: return 503 Service Unavailable
 ```
@@ -353,11 +399,12 @@ pub struct RuntimeLimits {
 
 ### Environment Variables
 
-| Variable                | Description        | Default   |
-| ----------------------- | ------------------ | --------- |
-| `WORKER_POOL_SIZE`      | Thread count       | CPU cores |
-| `MAX_WORKERS`           | Workers per thread | 10        |
-| `RUNTIME_SNAPSHOT_PATH` | V8 snapshot blob   | None      |
+| Variable                | Description                    | Default        |
+| ----------------------- | ------------------------------ | -------------- |
+| `WORKER_POOL_SIZE`      | Thread count                   | CPU cores      |
+| `MAX_QUEUED_WORKERS`    | Max workers in queue           | pool_size × 10 |
+| `WORKER_WAIT_TIMEOUT_MS`| Timeout waiting for queue slot | 10000 (10s)    |
+| `RUNTIME_SNAPSHOT_PATH` | V8 snapshot blob               | None           |
 
 ---
 
@@ -369,6 +416,7 @@ For security auditors:
 - [ ] ArrayBuffer allocator limits external memory (`security/array_buffer_allocator.rs`)
 - [ ] CPU enforcer terminates on timeout (`security/cpu_enforcer.rs`)
 - [ ] Wall-clock guard terminates on timeout (`security/timeout_guard.rs`)
+- [ ] Sequential worker pool ensures one isolate per thread (`worker_pool.rs`)
 - [ ] No filesystem APIs exposed
 - [ ] No child_process APIs exposed
 - [ ] Fetch routed through operations handler

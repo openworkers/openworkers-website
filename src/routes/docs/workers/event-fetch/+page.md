@@ -1,13 +1,63 @@
 # Handle HTTP requests
 
-To handle HTTP requests, you need to listen for the `fetch` event. This event is triggered whenever a request is made to your worker.
+To handle HTTP requests, you need to define a fetch handler. OpenWorkers supports two syntax styles:
 
-## Fetch event
+## ES Modules (recommended)
 
-The `fetch` event provides the following properties and methods:
+The modern, cleaner syntax. Your handler receives `request`, `env`, and `ctx` as arguments and returns a `Response` directly.
 
-- `request`: The [Request object](https://developer.mozilla.org/en-US/docs/Web/API/Request) representing the incoming request.
-- `respondWith`: A callback to send the [Response object](https://developer.mozilla.org/en-US/docs/Web/API/Request).
+```typescript
+export default {
+  async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
+    const { pathname } = new URL(request.url);
+
+    if (pathname === '/favicon.ico') {
+      return new Response('Not found', { status: 404 });
+    }
+
+    // Access bindings via env
+    const value = await env.KV.get('key');
+
+    return new Response('<h3>Hello world!</h3>', {
+      headers: { 'Content-Type': 'text/html' }
+    });
+  }
+}
+```
+
+### Parameters
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `request` | `Request` | The incoming [Request](https://developer.mozilla.org/en-US/docs/Web/API/Request) object |
+| `env` | `Env` | Object containing environment variables and bindings (KV, DB, etc.) |
+| `ctx` | `ExecutionContext` | Execution context with `waitUntil()` |
+
+---
+
+## Service Worker (legacy)
+
+The older syntax using `addEventListener`. Still supported for backwards compatibility.
+
+```typescript
+addEventListener('fetch', (event: FetchEvent) => {
+  event.respondWith(handleRequest(event.request));
+});
+
+async function handleRequest(request: Request): Promise<Response> {
+  const { pathname } = new URL(request.url);
+
+  if (pathname === '/favicon.ico') {
+    return new Response('Not found', { status: 404 });
+  }
+
+  return new Response('<h3>Hello world!</h3>', {
+    headers: { 'Content-Type': 'text/html' }
+  });
+}
+```
+
+### FetchEvent interface
 
 ```typescript
 interface FetchEvent {
@@ -16,54 +66,23 @@ interface FetchEvent {
 }
 ```
 
-## Example
+With Service Worker syntax, access bindings via `globalThis.env`:
 
 ```typescript
-addEventListener('fetch', (event: FetchEvent) => {
-  event.respondWith(handleRequest(event.request).catch((err: Error) => new Response(err.stack, { status: 500 })));
-});
-
-async function handleRequest(request: Request): Promise<Response> {
-  const { pathname } = new URL(request.url);
-
-  // Return a 404 response for requests to /favicon.ico.
-  if (pathname.startsWith('/favicon.ico')) {
-    return new Response('Not found', { status: 404 });
-  }
-
-  // Return a HTML response for all other requests.
-  return new Response('<h3>Hello world!</h3>', {
-    headers: { 'Content-Type': 'text/html' }
-  });
-}
+const value = await globalThis.env.KV.get('key');
 ```
 
 ---
 
-Let's break down the code:
+## Which style should I use?
 
-```typescript
-addEventListener('fetch', (event: FetchEvent) => { ... })
-```
+**Use ES Modules** for new projects:
+- Cleaner syntax (direct return, no `respondWith`)
+- `env` passed as parameter (better TypeScript support)
+- Consistent with Cloudflare Workers
 
-This line listens for the `fetch` event and calls the provided callback function whenever a request is made to the worker.
+**Use Service Worker** if:
+- Migrating existing code that uses `addEventListener`
+- You prefer the event-based pattern
 
----
-
-```typescript
-event.respondWith(...)
-```
-
-This line tells the worker how to respond to the request. You can respond with a `Response` object, a `Promise<Response>` object, or a `Response` object wrapped in a `Promise`.
-
----
-
-```typescript
-handleRequest(request: Request): Promise<Response>
-```
-
-This function takes a `Request` object as input and returns a `Promise<Response>`. It is responsible for processing the request and generating a response.
-
-A common pattern is to define a function like `handleRequest` to handle the request processing logic. This function can be as complex or as simple as needed, depending on the requirements of your worker.
-
-A simple example is provided in the code snippet above, where the function checks the requested pathname and returns different responses based on the path.
+Both styles work identically. If both are defined, ES Modules takes priority.
