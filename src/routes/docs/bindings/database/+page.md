@@ -1,124 +1,168 @@
 # Database Binding
 
-SQL database access from your workers.
+PostgreSQL database access from your workers.
 
-> **Status:** Work in progress
+---
 
 ## Usage
 
 ```javascript
-addEventListener('fetch', async (event) => {
-  const results = await env.DB.prepare('SELECT * FROM users WHERE id = ?').bind(1).all();
+export default {
+  async fetch(request, env, ctx) {
+    const results = await env.DB.query(
+      'SELECT * FROM users WHERE id = $1',
+      [1]
+    );
 
-  event.respondWith(
-    new Response(JSON.stringify(results), {
+    return new Response(JSON.stringify(results), {
       headers: { 'Content-Type': 'application/json' }
-    })
-  );
-});
+    });
+  }
+}
 ```
+
+---
 
 ## API
 
-### prepare(sql)
+### query(sql, params?)
 
-Create a prepared statement.
-
-```javascript
-const stmt = env.DB.prepare('SELECT * FROM users WHERE email = ?');
-```
-
-### bind(...values)
-
-Bind parameters to a prepared statement.
+Execute a SQL query with optional parameters.
 
 ```javascript
-const stmt = env.DB.prepare('INSERT INTO users (name, email) VALUES (?, ?)').bind('John', 'john@example.com');
+// Without parameters
+const users = await env.DB.query('SELECT * FROM users');
+
+// With parameters (use $1, $2, $3...)
+const user = await env.DB.query(
+  'SELECT * FROM users WHERE id = $1',
+  [userId]
+);
 ```
 
-### all()
+**Parameters:**
 
-Execute query and return all rows.
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `sql` | `string` | SQL query with `$1`, `$2`... placeholders |
+| `params` | `any[]` | Optional array of values to bind |
+
+**Returns:** `Promise<any[]>` - Array of row objects
+
+---
+
+## Parameter Binding
+
+Use PostgreSQL-style placeholders (`$1`, `$2`, `$3`...). Parameters are 1-indexed.
 
 ```javascript
-const { results } = await env.DB.prepare('SELECT * FROM posts').all();
+// Single parameter
+await env.DB.query('SELECT * FROM posts WHERE id = $1', [42]);
 
-// results = [{ id: 1, title: '...' }, { id: 2, title: '...' }]
+// Multiple parameters
+await env.DB.query(
+  'SELECT * FROM posts WHERE author = $1 AND status = $2',
+  ['john', 'published']
+);
+
+// Type casting (when needed)
+await env.DB.query(
+  'INSERT INTO scores (value) VALUES ($1::int)',
+  [scoreString]
+);
 ```
 
-### first()
-
-Execute query and return first row.
-
-```javascript
-const user = await env.DB.prepare('SELECT * FROM users WHERE id = ?').bind(1).first();
-
-// user = { id: 1, name: 'John', email: '...' }
-```
-
-### run()
-
-Execute a statement (INSERT, UPDATE, DELETE).
-
-```javascript
-const { success, meta } = await env.DB.prepare('DELETE FROM sessions WHERE expires < ?').bind(Date.now()).run();
-
-// meta.changes = number of rows affected
-```
+> **Note:** All parameters are passed as strings. PostgreSQL handles type conversion automatically in most cases. Use explicit casts (`::int`, `::boolean`, etc.) when needed.
 
 ---
 
 ## Examples
 
-### CRUD operations
+### CRUD Operations
 
 ```javascript
 // Create
-await env.DB.prepare('INSERT INTO posts (title, body) VALUES (?, ?)').bind('Hello', 'World').run();
+const newPost = await env.DB.query(
+  'INSERT INTO posts (title, body) VALUES ($1, $2) RETURNING *',
+  ['Hello', 'World']
+);
 
 // Read
-const posts = await env.DB.prepare('SELECT * FROM posts').all();
+const posts = await env.DB.query('SELECT * FROM posts');
+
+// Read with filter
+const post = await env.DB.query(
+  'SELECT * FROM posts WHERE id = $1',
+  [postId]
+);
 
 // Update
-await env.DB.prepare('UPDATE posts SET title = ? WHERE id = ?').bind('Updated', 1).run();
+const updated = await env.DB.query(
+  'UPDATE posts SET title = $1 WHERE id = $2 RETURNING *',
+  ['Updated Title', postId]
+);
 
 // Delete
-await env.DB.prepare('DELETE FROM posts WHERE id = ?').bind(1).run();
+await env.DB.query('DELETE FROM posts WHERE id = $1', [postId]);
 ```
 
-### Transactions
+### Aggregations
 
 ```javascript
-const results = await env.DB.batch([
-  env.DB.prepare('UPDATE accounts SET balance = balance - ? WHERE id = ?').bind(100, 1),
-  env.DB.prepare('UPDATE accounts SET balance = balance + ? WHERE id = ?').bind(100, 2)
-]);
+const stats = await env.DB.query(`
+  SELECT
+    COUNT(*) as total,
+    AVG(score)::int as avg_score
+  FROM games
+  WHERE created_at > NOW() - INTERVAL '7 days'
+`);
+```
+
+### Joins
+
+```javascript
+const postsWithAuthors = await env.DB.query(`
+  SELECT
+    p.id,
+    p.title,
+    u.name as author_name
+  FROM posts p
+  JOIN users u ON p.author_id = u.id
+  WHERE p.status = $1
+  ORDER BY p.created_at DESC
+  LIMIT $2
+`, ['published', 10]);
 ```
 
 ---
 
 ## Configuration
 
-Databases are created in the dashboard under **Databases**.
+Add a database binding in the dashboard:
 
-Each database provides:
-
-- A unique ID
-- A token for authentication
-- Connection details
+1. Go to your worker settings
+2. Click **Add Binding**
+3. Select **Database**
+4. Choose your database and set the binding name (e.g., `DB`)
 
 ---
 
 ## Limits
 
-| Limit                      | Value  |
-| -------------------------- | ------ |
-| Max query size             | 1 MB   |
-| Max rows returned          | 10,000 |
-| Max concurrent connections | 10     |
+| Limit | Value |
+|-------|-------|
+| Query timeout | 30 seconds |
+| Max result size | 10 MB |
 
 ---
 
-## Compatibility
+## Differences from Cloudflare D1
 
-The Database binding API is designed to be compatible with [Cloudflare D1](https://developers.cloudflare.com/d1/).
+OpenWorkers uses a simpler API than Cloudflare D1:
+
+| D1 | OpenWorkers |
+|----|-------------|
+| `env.DB.prepare(sql).bind(...).all()` | `env.DB.query(sql, params)` |
+| `env.DB.prepare(sql).bind(...).first()` | `(await env.DB.query(sql, params))[0]` |
+| `env.DB.prepare(sql).bind(...).run()` | `env.DB.query(sql, params)` |
+| `?` placeholders | `$1`, `$2`... placeholders |
