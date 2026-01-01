@@ -8,7 +8,7 @@ Bindings connect workers to external resources without exposing credentials. The
 
 ```
 ┌─────────────────────────────────────────────────────┐
-│  Worker (untrusted code)                            │
+│  Worker                                             │
 │                                                     │
 │  await env.KV.get('session:123')                    │
 │       ↓                                             │

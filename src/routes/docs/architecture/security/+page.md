@@ -1,6 +1,8 @@
 # Security Model
 
-OpenWorkers executes untrusted code in a multi-tenant environment. This document details the security architecture.
+OpenWorkers executes JavaScript in V8 isolates with resource isolation. This document details the sandboxing architecture.
+
+> **Note:** This provides resource isolation (CPU, memory, network) between workers. For running truly untrusted third-party code in a multi-tenant environment, consider adding an extra layer (container, VM) around the runtime.
 
 ## Quick Summary
 
@@ -19,7 +21,7 @@ OpenWorkers executes untrusted code in a multi-tenant environment. This document
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                    Untrusted JavaScript                          │
+│                       JavaScript Code                            │
 └─────────────────────────────────────────────────────────────────┘
                               │
                               ▼

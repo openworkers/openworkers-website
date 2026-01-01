@@ -33,7 +33,7 @@ Workers **never see credentials**. The runner injects authentication server-side
 
 ```
 ┌─────────────────────────────────────────────────────┐
-│  Worker (untrusted code)                            │
+│  Worker                                             │
 │                                                     │
 │  env.STORAGE.fetch('/data.json')                    │
 │       ↓                                             │

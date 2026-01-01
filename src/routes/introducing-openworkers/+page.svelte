@@ -17,7 +17,7 @@
 
     <div class="prose prose-slate prose-lg max-w-none">
       <p class="lead">
-        OpenWorkers is an open-source runtime for executing untrusted JavaScript in V8 isolates. 
+        OpenWorkers is an open-source runtime for executing JavaScript in V8 isolates. 
         It brings the power of edge computing to your own infrastructure.
       </p>
 
@@ -77,7 +77,7 @@
                 └─────────────────┘           └──────────────┘`}</pre>
 
       <ul class="space-y-2">
-        <li><strong>V8 Isolates:</strong> Secure sandboxing with CPU (100ms) and memory (128MB) limits per worker.</li>
+        <li><strong>V8 Isolates:</strong> Sandboxing with CPU (100ms) and memory (128MB) limits per worker.</li>
         <li><strong>Cron Scheduling:</strong> Built-in support for 5 or 6-field cron syntax.</li>
         <li><strong>Compatibility:</strong> Cloudflare Workers syntax compatible.</li>
       </ul>
@@ -98,7 +98,7 @@
         and ran on that for two years. Recently, with Claude's help, I rewrote everything on top of rusty_v8 directly.
       </p>
       <p>
-        The goal has always been the same: run untrusted JavaScript securely on your own servers,
+        The goal has always been the same: run JavaScript on your own servers,
         with the same DX as Cloudflare Workers but without vendor lock-in.
       </p>
 
