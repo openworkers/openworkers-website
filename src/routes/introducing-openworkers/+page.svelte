@@ -55,7 +55,8 @@
 
       <h2 class="text-2xl font-bold text-slate-900 mt-12 mb-6">Architecture</h2>
 
-      <pre class="my-8 overflow-x-auto rounded-lg bg-slate-50 p-4 text-xs leading-relaxed text-slate-700 ring-1 ring-slate-200">{`                         ┌─────────────────┐
+      <div class="my-8 overflow-x-auto rounded-lg bg-slate-50 ring-1 ring-slate-200">
+        <pre class="min-w-[600px] p-4 text-xs leading-relaxed text-slate-700">{`                         ┌─────────────────┐
                          │  nginx (proxy)  │
                          └────────┬────────┘
                                   │
@@ -75,6 +76,7 @@
                 ┌─────────────────┐           ┌──────┴───────┐
          * ─────┥   PostgreSQL    │           │ scheduler *  │
                 └─────────────────┘           └──────────────┘`}</pre>
+      </div>
 
       <ul class="space-y-2">
         <li><strong>V8 Isolates:</strong> Sandboxing with CPU (100ms) and memory (128MB) limits per worker.</li>
