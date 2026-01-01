@@ -90,6 +90,39 @@ Workers emit logs via `console.log`. The flow:
 
 This decouples log ingestion from request handling.
 
+### 6. Unified Database Access via Postgate
+
+[Postgate](https://github.com/openworkers/postgate) is a PostgreSQL HTTP proxy with token-based authentication. It serves two purposes:
+
+1. **API access** — The OpenWorkers API uses Postgate HTTP to query the platform database
+2. **Worker bindings** — The runner uses Postgate as a library for `env.DB.query()` calls
+
+Both share the same database and token system via PostgreSQL views:
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                         PostgreSQL                              │
+├─────────────────────────────────────────────────────────────────┤
+│  database_configs          │  database_tokens                   │
+│  ─────────────────         │  ────────────────                  │
+│  - API database            │  - API token                       │
+│  - User databases          │  - User tokens (future)            │
+│         ▲                  │         ▲                          │
+│         │                  │         │                          │
+│  ┌──────┴──────────────────┴─────────┴───────┐                  │
+│  │              Postgate Views               │                  │
+│  │  postgate_databases  ←→  database_configs │                  │
+│  │  postgate_tokens     ←→  database_tokens  │                  │
+│  └───────────────────────────────────────────┘                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+This architecture means:
+
+- **Single database** — No separate Postgate database needed
+- **Unified tokens** — Same system for API and user databases
+- **Future: HTTP access for users** — User databases will be accessible via Postgate HTTP (for debugging, migrations, CI/CD)
+
 ---
 
 ## Future Work
