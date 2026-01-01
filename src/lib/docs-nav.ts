@@ -55,6 +55,7 @@ export const docsNav: NavItem[] = [
       { name: 'Bindings', path: '/docs/architecture/bindings' },
       { name: 'HTTP Flow', path: '/docs/architecture/http-flow' },
       { name: 'Event Loop', path: '/docs/architecture/event-loop' },
+      { name: 'Stream Cancellation', path: '/docs/architecture/stream-cancellation' },
       { name: 'Security', path: '/docs/architecture/security' }
     ]
   }

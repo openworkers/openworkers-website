@@ -82,7 +82,11 @@
       {#if status === 'success'}
         <p class="text-green-600">Subscribed!</p>
       {:else}
-        <form class="flex justify-between gap-4" onsubmit={subscribe}>
+        <form class="flex flex-wrap justify-between gap-4" onsubmit={subscribe}>
+          {#if status === 'error'}
+            <p class="w-full text-red-600">Failed to subscribe. Please try again.</p>
+          {/if}
+
           <div class="relative max-w-[24rem] flex-1 rounded border lg:max-w-[32rem]">
             <svg
               xmlns="http://www.w3.org/2000/svg"
