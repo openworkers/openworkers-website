@@ -19,7 +19,11 @@
       </a>
     </div>
 
-    <div class="flex gap-8 font-semibold">
+    <div class="flex items-center gap-8 font-semibold">
+      <a href="https://github.com/openworkers" target="_blank" class="group">
+        <span class="sr-only">GitHub</span>
+        <img src="/github.svg" alt="GitHub" class="h-5 w-5 opacity-60 transition-opacity group-hover:opacity-100" />
+      </a>
       <a class="link" class:active={isDocsPage} href="/docs">Docs</a>
       <a class="link" href={loginUrl} target="_blank">Sign in</a>
     </div>
