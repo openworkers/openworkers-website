@@ -2,7 +2,7 @@
 
 OpenWorkers executes JavaScript in V8 isolates with resource isolation. This document details the sandboxing architecture.
 
-> **Note:** This provides resource isolation (CPU, memory, network) between workers. For running truly untrusted third-party code in a multi-tenant environment, consider adding an extra layer (container, VM) around the runtime.
+> **Note:** OpenWorkers is designed for running your own code on your own infrastructure – not for multi-tenant SaaS with untrusted third-party code. Cloudflare has dedicated security teams, 24h V8 patches, and years of hardening. If you need that level of security, use Cloudflare Workers. If you need to run untrusted code, add an extra layer (container, VM) around the runtime.
 
 ## Quick Summary
 
