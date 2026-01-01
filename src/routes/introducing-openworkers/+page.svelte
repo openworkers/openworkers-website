@@ -23,7 +23,7 @@
 
       <h2 class="text-2xl font-bold text-slate-900 mt-12 mb-6">What works today</h2>
       
-      <div class="not-prose my-8">
+      <div class="not-prose my-8 -mx-6 sm:mx-0">
         <Console title="worker.ts" content={data.workerHtml} />
       </div>
 
@@ -87,7 +87,7 @@
         Deployment is designed to be simple. A single PostgreSQL database and a single Docker Compose file is all you need.
       </p>
 
-      <div class="not-prose my-8">
+      <div class="not-prose my-8 -mx-6 sm:mx-0">
         <Console title="terminal" content={data.selfHostHtml} />
       </div>
 
