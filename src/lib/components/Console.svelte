@@ -17,7 +17,7 @@
   );
 </script>
 
-<div class="max-h-none m-12 overflow-hidden rounded-xl border border-slate-100 bg-white shadow-[0_5px_20px_#0001]">
+<div class="max-h-none mx-4 my-12 overflow-hidden rounded-xl border border-slate-100 bg-white shadow-[0_5px_20px_#0001] sm:mx-12">
   <div class="flex h-10 border-b border-slate-100">
     <div class="flex w-[33%] items-center space-x-2 px-4">
       <div class="h-3 w-3 rounded-full bg-slate-200"></div>
