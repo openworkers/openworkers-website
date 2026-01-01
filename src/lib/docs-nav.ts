@@ -14,7 +14,8 @@ export const docsNav: NavItem[] = [
       { name: 'Custom domains', path: '/docs/custom-domains' },
       { name: 'Online editor', path: '/docs/online-editor' },
       { name: 'Environment variables', path: '/docs/environment-variables' },
-      { name: 'Limits & Quotas', path: '/docs/limits' }
+      { name: 'Limits & Quotas', path: '/docs/limits' },
+      { name: 'Self-Hosting', path: '/docs/self-hosting' }
     ]
   },
   {

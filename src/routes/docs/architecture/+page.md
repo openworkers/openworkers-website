@@ -129,4 +129,5 @@ OpenWorkers is open source. Contributions welcome!
 | [openworkers-logs](https://github.com/openworkers/openworkers-logs)             | Log ingestion (NATS → DB) and SSE streaming |
 | [openworkers-cli](https://github.com/openworkers/openworkers-cli)               | Admin/infra tool                            |
 | [openworkers-dash](https://github.com/openworkers/openworkers-dash)             | Dashboard (Angular)                         |
-| [postgate](https://github.com/openworkers/postgate)                             | PostgreSQL proxy for DB bindings (planned)  |
+| [postgate](https://github.com/openworkers/postgate)                             | PostgreSQL proxy for DB bindings            |
+| [openworkers-infra](https://github.com/openworkers/openworkers-infra)           | Docker Compose setup for self-hosting       |
