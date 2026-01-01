@@ -101,6 +101,20 @@
   }
 }
 
+@layer components {
+  .glass-panel {
+    @apply bg-white/70 backdrop-blur-lg border border-white/20 shadow-xl;
+  }
+
+  .text-gradient-primary {
+    @apply bg-gradient-to-r from-slate-900 to-slate-600 bg-clip-text text-transparent;
+  }
+
+  .text-gradient-blue {
+    @apply bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent;
+  }
+}
+
 @layer utilities {
   .scrollbar-none {
     scrollbar-width: none;

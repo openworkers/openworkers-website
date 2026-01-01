@@ -39,6 +39,10 @@
     <div class="flex w-full flex-col justify-between px-8 lg:flex-row lg:gap-8">
       <div class="mx-auto max-w-xl flex-1">
         <div>
+          <div class="mb-6 inline-flex items-center rounded-full border border-blue-100 bg-blue-50 px-3 py-1 text-sm font-medium text-blue-600">
+            Now in public beta
+          </div>
+
           <h1 class="title mb-4 text-5xl font-bold text-slate-800">
             Deploy&nbsp;<span class="text-gradient">instantly</span>
           </h1>
@@ -53,84 +57,104 @@
               <li>Easily bind your domains to workers</li>
             </ul>
           </div>
+
+          <div class="flex flex-col gap-4 sm:flex-row">
+            <a href={loginUrl} target="_blank" class="btn btn-blue rounded px-6 py-4 text-xl">
+              Get Started
+            </a>
+            <a href="/docs" class="btn rounded border border-slate-200 bg-white px-6 py-4 text-xl text-slate-700 hover:bg-slate-50">
+              Read Documentation
+            </a>
+          </div>
         </div>
       </div>
 
       <div class="mx-auto max-w-xl flex-1">
         <Console title="hello.ts" content={data.codeHtml}>
           {#snippet footer()}
-            <a
-              href="/docs/examples/telegram"
-              class="flex h-12 items-center justify-center hover:bg-slate-50 hover:text-slate-800"
-            >
-              Check out more examples
-            </a>
+            <div class="flex items-center justify-between px-6 py-3">
+              <span class="text-xs text-slate-500">TypeScript supported out of the box</span>
+              <a
+                href="/docs/examples/json-api"
+                class="text-xs font-medium text-blue-500 transition-colors hover:text-blue-600"
+              >
+                View more examples
+              </a>
+            </div>
           {/snippet}
         </Console>
       </div>
     </div>
-
-    <div class="mx-auto lg:mb-8">
-      <a href={loginUrl} target="_blank" class="btn btn-blue my-24 rounded px-6 py-4 text-xl"> Get Started </a>
-    </div>
   </div>
 
-  <div class="container mb-24 max-w-7xl">
-    <div class="flex w-full flex-col justify-between border-y px-4 py-12 md:flex-row md:py-24">
-      <h4 class="flex items-center py-2">Sign up for our newsletter</h4>
+  <div class="container my-24 max-w-7xl">
+    <div class="rounded-2xl border border-slate-200 bg-white px-6 py-12 sm:px-12">
+      <div class="flex w-full flex-col items-center justify-between gap-6 md:flex-row">
+        <h4 class="text-xl font-semibold text-slate-800">Sign up for our newsletter</h4>
 
-      {#if status === 'success'}
-        <p class="text-green-600">Subscribed!</p>
-      {:else}
-        <form class="flex flex-wrap justify-between gap-4" onsubmit={subscribe}>
-          {#if status === 'error'}
-            <p class="w-full text-red-600">Failed to subscribe. Please try again.</p>
-          {/if}
+        {#if status === 'success'}
+          <p class="text-green-600 font-medium">Subscribed!</p>
+        {:else}
+          <form class="flex flex-wrap items-center justify-end gap-4" onsubmit={subscribe}>
+            {#if status === 'error'}
+              <p class="w-full text-right text-red-600">Failed to subscribe. Please try again.</p>
+            {/if}
 
-          <div class="relative max-w-[24rem] flex-1 rounded border lg:max-w-[32rem]">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="1.5"
-              stroke="currentColor"
-              class="absolute top-1/2 mx-2 h-6 w-6 translate-y-[-50%] text-slate-400"
-            >
-              <path
-                stroke-linecap="round"
-                d="M16.5 12a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zm0 0c0 1.657 1.007 3 2.25 3S21 13.657 21 12a9 9 0 10-2.636 6.364M16.5 12V8.25"
+            <div class="relative max-w-[24rem] flex-1 rounded-lg border border-slate-200 lg:max-w-[32rem]">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="absolute top-1/2 mx-3 h-5 w-5 translate-y-[-50%] text-slate-400"
+              >
+                <path
+                  stroke-linecap="round"
+                  d="M16.5 12a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zm0 0c0 1.657 1.007 3 2.25 3S21 13.657 21 12a9 9 0 10-2.636 6.364M16.5 12V8.25"
+                />
+              </svg>
+
+              <input
+                class="h-12 w-full rounded-lg pr-4 pl-10 lg:min-w-[20rem]"
+                type="email"
+                bind:value={email}
+                autocomplete="email"
+                placeholder="Email"
+                required
               />
-            </svg>
+            </div>
 
-            <input
-              class="h-full w-full pr-4 pl-10 lg:min-w-[24rem]"
-              type="email"
-              bind:value={email}
-              autocomplete="email"
-              placeholder="Email"
-              required
-            />
-          </div>
-
-          <button type="submit" class="btn btn-blue max-w-xs rounded px-4 py-2 text-xl" disabled={status === 'loading'}>
-            {status === 'loading' ? 'Subscribing...' : 'Subscribe'}
-          </button>
-        </form>
-      {/if}
+            <button type="submit" class="btn btn-blue h-12 rounded-lg px-6 text-lg" disabled={status === 'loading'}>
+              {status === 'loading' ? 'Subscribing...' : 'Subscribe'}
+            </button>
+          </form>
+        {/if}
+      </div>
     </div>
   </div>
 
-  <div class="container mb-24 max-w-7xl items-center justify-center gap-8">
-    <a href="https://github.com/openworkers" target="_blank">
-      <img src="/github.svg" alt="github" class="h-16 w-16" />
-    </a>
+  <footer class="border-t border-slate-200">
+    <div class="container max-w-7xl flex-col items-center py-12 md:flex-row md:justify-between">
+      <div class="mb-4 flex items-baseline gap-4 md:mb-0">
+        <span class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-slate-800 to-slate-600">OpenWorkers</span>
+        <span class="text-sm text-slate-500">© {new Date().getFullYear()} OpenWorkers</span>
+      </div>
 
-    <a href="https://t.me/openworkers" target="_blank">
-      <img src="/telegram.svg" alt="telegram" class="h-16 w-16" />
-    </a>
-
-    <a href="https://twitter.com/openworkers" target="_blank">
-      <img src="/twitter.svg" alt="twitter" class="h-16 w-16" />
-    </a>
-  </div>
+      <div class="flex gap-8">
+        <a href="https://github.com/openworkers" target="_blank" class="group">
+          <span class="sr-only">GitHub</span>
+          <img src="/github.svg" alt="github" class="h-6 w-6 opacity-60 transition-opacity group-hover:opacity-100" />
+        </a>
+        <a href="https://t.me/openworkers" target="_blank" class="group">
+          <span class="sr-only">Telegram</span>
+          <img src="/telegram.svg" alt="telegram" class="h-6 w-6 opacity-60 transition-opacity group-hover:opacity-100" />
+        </a>
+        <a href="https://twitter.com/openworkers" target="_blank" class="group">
+          <span class="sr-only">Twitter</span>
+          <img src="/twitter.svg" alt="twitter" class="h-6 w-6 opacity-60 transition-opacity group-hover:opacity-100" />
+        </a>
+      </div>
+    </div>
+  </footer>
 </div>
