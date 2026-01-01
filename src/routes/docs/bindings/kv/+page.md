@@ -2,20 +2,23 @@
 
 Key-value storage for small data with low latency. Ideal for caching, sessions, feature flags, and configuration.
 
+KV stores values as JSON natively — you can put strings, numbers, booleans, objects, and arrays directly without manual serialization.
+
 ## Usage
 
 ```javascript
-addEventListener('fetch', async (event) => {
-  // Read a value
-  const value = await env.KV.get('user:123');
+export default {
+  async fetch(request, env) {
+    // Read a value
+    const user = await env.KV.get('user:123');
 
-  if (!value) {
-    event.respondWith(new Response('Not found', { status: 404 }));
-    return;
+    if (!user) {
+      return new Response('Not found', { status: 404 });
+    }
+
+    return Response.json(user);
   }
-
-  event.respondWith(new Response(value));
-});
+};
 ```
 
 ## Operations
@@ -25,23 +28,43 @@ addEventListener('fetch', async (event) => {
 Read a value by key. Returns `null` if the key doesn't exist or has expired.
 
 ```javascript
-const value = await env.KV.get('session:abc123');
+// Returns the parsed value directly
+const user = await env.KV.get('user:123');
+// user is { name: 'John', role: 'admin' } — already an object
 
-if (value === null) {
+if (user === null) {
   console.log('Key not found');
 }
 ```
 
+**TypeScript:** Use the generic type parameter for type inference:
+
+```typescript
+interface User {
+  name: string;
+  role: 'admin' | 'user';
+}
+
+const user = await env.KV.get<User>('user:123');
+// user is User | null
+```
+
 ### put(key, value, options?)
 
-Write a value. Optionally set an expiration time.
+Store a JSON-serializable value. Optionally set an expiration time.
 
 ```javascript
-// Simple put
-await env.KV.put('user:123', JSON.stringify({ name: 'John', role: 'admin' }));
+// Store an object
+await env.KV.put('user:123', { name: 'John', role: 'admin' });
+
+// Store a string
+await env.KV.put('greeting', 'Hello, World!');
+
+// Store a number
+await env.KV.put('counter', 42);
 
 // With expiration (TTL in seconds)
-await env.KV.put('session:abc', 'data', { expiresIn: 3600 }); // Expires in 1 hour
+await env.KV.put('session:abc', { userId: 123 }, { expiresIn: 3600 }); // Expires in 1 hour
 ```
 
 | Option      | Type     | Description                                                                 |
@@ -60,7 +83,7 @@ await env.KV.delete('session:expired');
 
 ### list(options?)
 
-List all keys in the namespace.
+List all keys in the namespace. Returns an array of key names.
 
 ```javascript
 // List all keys
@@ -85,32 +108,32 @@ const firstTen = await env.KV.list({ limit: 10 });
 ### Session storage with expiration
 
 ```javascript
-addEventListener('fetch', async (event) => {
-  const sessionId = event.request.headers.get('Cookie')?.match(/session=(\w+)/)?.[1];
+export default {
+  async fetch(request, env) {
+    const sessionId = request.headers.get('Cookie')?.match(/session=(\w+)/)?.[1];
 
-  if (!sessionId) {
-    event.respondWith(new Response('Unauthorized', { status: 401 }));
-    return;
+    if (!sessionId) {
+      return new Response('Unauthorized', { status: 401 });
+    }
+
+    const session = await env.KV.get(`session:${sessionId}`);
+
+    if (!session) {
+      return new Response('Session expired', { status: 401 });
+    }
+
+    // Refresh session TTL on activity
+    await env.KV.put(`session:${sessionId}`, session, { expiresIn: 1800 });
+
+    return new Response('OK');
   }
-
-  const session = await env.KV.get(`session:${sessionId}`);
-
-  if (!session) {
-    event.respondWith(new Response('Session expired', { status: 401 }));
-    return;
-  }
-
-  // Refresh session TTL on activity
-  await env.KV.put(`session:${sessionId}`, session, { expiresIn: 1800 });
-
-  // Session valid, continue...
-});
+};
 ```
 
 ### Feature flags
 
 ```javascript
-const flags = JSON.parse((await env.KV.get('feature-flags')) || '{}');
+const flags = await env.KV.get('feature-flags') || {};
 
 if (flags.newCheckout) {
   // Show new checkout flow
@@ -120,23 +143,22 @@ if (flags.newCheckout) {
 ### Rate limiting with auto-expiration
 
 ```javascript
-const ip = event.request.headers.get('CF-Connecting-IP');
+const ip = request.headers.get('CF-Connecting-IP');
 const key = `ratelimit:${ip}`;
-const count = parseInt((await env.KV.get(key)) || '0');
+const count = (await env.KV.get(key)) || 0;
 
 if (count > 100) {
-  event.respondWith(new Response('Too many requests', { status: 429 }));
-  return;
+  return new Response('Too many requests', { status: 429 });
 }
 
 // Auto-reset after 1 minute
-await env.KV.put(key, String(count + 1), { expiresIn: 60 });
+await env.KV.put(key, count + 1, { expiresIn: 60 });
 ```
 
 ### List and cleanup
 
 ```javascript
-// Find all expired session markers
+// Find all sessions
 const sessions = await env.KV.list({ prefix: 'session:' });
 
 for (const key of sessions) {
@@ -155,8 +177,25 @@ for (const key of sessions) {
 | Limit              | Value     |
 | ------------------ | --------- |
 | Key size           | 512 bytes |
-| Value size         | 25 MB     |
+| Value size         | 100 KB    |
 | Keys per namespace | Unlimited |
+
+---
+
+## Supported Value Types
+
+KV stores JSON-serializable values. The following types are supported:
+
+| Type      | Example                           |
+| --------- | --------------------------------- |
+| `string`  | `'hello'`                         |
+| `number`  | `42`, `3.14`                      |
+| `boolean` | `true`, `false`                   |
+| `null`    | `null`                            |
+| `array`   | `[1, 2, 3]`                       |
+| `object`  | `{ name: 'John', age: 30 }`       |
+
+> **Note:** Binary data (`Uint8Array`, `ArrayBuffer`) is not supported. Use the [Storage binding](/docs/bindings/storage) for binary data.
 
 ---
 
@@ -164,10 +203,11 @@ for (const key of sessions) {
 
 | Feature    | KV                      | Storage                 |
 | ---------- | ----------------------- | ----------------------- |
-| Data model | Key-value pairs         | Files/blobs             |
+| Data model | JSON values             | Files/blobs             |
 | Latency    | Low (~ms)               | Medium (~100ms)         |
-| Max value  | 25 MB                   | Unlimited               |
+| Max value  | 100 KB                  | Unlimited               |
 | Expiration | Built-in TTL            | Manual                  |
+| Binary     | No                      | Yes                     |
 | Use case   | Cache, sessions, config | Files, uploads, backups |
 
-Use **KV** for small, frequently accessed data with optional expiration. Use **Storage** for larger files or binary data.
+Use **KV** for small, frequently accessed JSON data with optional expiration. Use **Storage** for larger files or binary data.
