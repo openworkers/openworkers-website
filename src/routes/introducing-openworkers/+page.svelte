@@ -18,7 +18,7 @@
     <div class="prose prose-slate prose-lg max-w-none">
       <p class="lead">
         OpenWorkers is an open-source runtime for executing JavaScript in V8 isolates. 
-        It brings the power of edge computing to your own infrastructure.
+        It brings the Cloudflare Workers programming model to your own infrastructure.
       </p>
 
       <h2 class="text-2xl font-bold text-slate-900 mt-12 mb-6">What works today</h2>

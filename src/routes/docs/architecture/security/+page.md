@@ -6,14 +6,14 @@ OpenWorkers executes JavaScript in V8 isolates with resource isolation. This doc
 
 ## Quick Summary
 
-| Layer          | Protection                                    | Default    |
-| -------------- | --------------------------------------------- | ---------- |
-| **Memory**     | V8 heap limits + custom ArrayBuffer allocator | 128 MB     |
-| **CPU Time**   | POSIX timer (Linux)                           | 50 ms      |
-| **Wall Clock** | Watchdog thread                               | 30 seconds |
-| **Network**    | Fetch via operations handler                  | Controlled |
-| **Filesystem** | Not exposed                                   | Blocked    |
-| **Processes**  | Not exposed                                   | Blocked    |
+| Layer          | Protection                                    | Default     |
+| -------------- | --------------------------------------------- | ----------- |
+| **Memory**     | V8 heap limits + custom ArrayBuffer allocator | 128 MB      |
+| **CPU Time**   | POSIX timer (Linux)                           | 100 ms      |
+| **Wall Clock** | Watchdog thread                               | 60 seconds  |
+| **Network**    | Fetch via operations handler                  | Controlled  |
+| **Filesystem** | Not exposed                                   | Blocked     |
+| **Processes**  | Not exposed                                   | Blocked     |
 
 ---
 
@@ -115,7 +115,7 @@ On Linux, we use `CLOCK_THREAD_CPUTIME_ID` to track actual CPU time:
 Worker starts executing
         │
         ▼
-POSIX timer armed (50ms CPU time)
+POSIX timer armed (100ms CPU time)
         │
         ├──► JavaScript runs (uses CPU)
         │
@@ -124,7 +124,7 @@ POSIX timer armed (50ms CPU time)
         ├──► JavaScript runs (CPU timer RESUMES)
         │
         ▼
-Timer fires SIGALRM after 50ms of CPU time
+Timer fires SIGALRM after 100ms of CPU time
         │
         ▼
 isolate.terminate_execution()
@@ -375,8 +375,8 @@ performance.now();
 | Threat               | Attack                     | Protection                      |
 | -------------------- | -------------------------- | ------------------------------- |
 | **Memory bomb**      | Allocate 1GB buffer        | ArrayBuffer allocator rejects   |
-| **CPU mining**       | Infinite loop              | CPU timer terminates (50ms)     |
-| **Slow loris**       | Hold connection forever    | Wall-clock timeout (30s)        |
+| **CPU mining**       | Infinite loop              | CPU timer terminates (100ms)    |
+| **Slow loris**       | Hold connection forever    | Wall-clock timeout (60s)        |
 | **Fork bomb**        | Spawn processes            | No process API exposed          |
 | **Disk fill**        | Write huge files           | No filesystem API exposed       |
 | **Network DoS**      | Infinite outbound requests | Operations handler controls     |
@@ -394,8 +394,8 @@ performance.now();
 pub struct RuntimeLimits {
     pub heap_initial_mb: usize,       // Default: 1
     pub heap_max_mb: usize,           // Default: 128
-    pub max_cpu_time_ms: u64,         // Default: 50 (Linux only)
-    pub max_wall_clock_time_ms: u64,  // Default: 30_000
+    pub max_cpu_time_ms: u64,         // Default: 100 (Linux only)
+    pub max_wall_clock_time_ms: u64,  // Default: 60_000
 }
 ```
 

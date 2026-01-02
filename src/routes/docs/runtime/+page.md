@@ -456,8 +456,8 @@ global; // Alias (Node.js compatibility)
 
 ## Limitations
 
-- **No module system** - No `import`/`export` or `require()`
-- **No DOM** - No `document`, `window`, or browser-specific APIs
-- **No WebSocket** - Only HTTP via Fetch API
-- **No Node.js APIs** - No `fs`, `path`, `process`, etc.
-- **Single-threaded** - No Web Workers or shared memory
+- **No dynamic imports** — Code must be pre-bundled. Use `esbuild` or similar to bundle your code before deploying. The `export default` handler syntax works, but `import './module.js'` at runtime does not.
+- **No DOM** — No `document`, `window`, or browser-specific APIs
+- **No WebSocket** — Only HTTP via Fetch API
+- **No Node.js APIs** — No `fs`, `path`, `process`, etc.
+- **Single-threaded** — No Web Workers or shared memory
