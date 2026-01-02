@@ -28,13 +28,14 @@ Bindings connect workers to external resources without exposing credentials. The
 
 ## Binding Types
 
-| Type      | Description               | Backend    |
-| --------- | ------------------------- | ---------- |
-| `var`     | Environment variable      | In-memory  |
-| `secret`  | Hidden variable           | In-memory  |
-| `assets`  | Static files (read-only)  | S3/R2      |
-| `storage` | Blob storage (read/write) | S3/R2      |
-| `kv`      | Key-value with TTL        | PostgreSQL |
+| Type       | Description               | Backend    |
+| ---------- | ------------------------- | ---------- |
+| `var`      | Environment variable      | In-memory  |
+| `secret`   | Hidden variable           | In-memory  |
+| `assets`   | Static files (read-only)  | S3/R2      |
+| `storage`  | Blob storage (read/write) | S3/R2      |
+| `kv`       | Key-value with TTL        | PostgreSQL |
+| `database` | SQL queries               | PostgreSQL |
 
 ## Database Schema
 
