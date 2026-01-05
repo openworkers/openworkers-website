@@ -18,33 +18,33 @@ OpenWorkers detects client disconnection at multiple levels:
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                      Client Disconnects                          │
+│                      Client Disconnects                         │
 └─────────────────────────────────────────────────────────────────┘
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│                    Actix-web / HTTP Layer                        │
-│                                                                  │
-│   • Detects TCP connection closed                                │
-│   • Drops the response stream receiver                           │
+│                      Hyper / HTTP Layer                         │
+│                                                                 │
+│   • Detects TCP connection closed                               │
+│   • Drops the response stream (StreamBody::drop)                │
 └─────────────────────────────────────────────────────────────────┘
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│                      StreamManager (Rust)                        │
-│                                                                  │
-│   • Channel sender is dropped                                    │
-│   • has_sender(stream_id) returns false                          │
-│   • try_write_chunk() returns error                              │
+│                      StreamManager (Rust)                       │
+│                                                                 │
+│   • Channel sender is dropped                                   │
+│   • has_sender(stream_id) returns false                         │
+│   • try_write_chunk() returns error                             │
 └─────────────────────────────────────────────────────────────────┘
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│                    JavaScript Runtime                            │
-│                                                                  │
-│   • controller.signal.aborted = true                             │
-│   • enqueue() throws TypeError                                   │
-│   • __responseStreamIsClosed() returns true                      │
+│                    JavaScript Runtime                           │
+│                                                                 │
+│   • controller.signal.aborted = true                            │
+│   • enqueue() throws TypeError                                  │
+│   • __responseStreamIsClosed() returns true                     │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -64,8 +64,8 @@ export default {
             break;
           }
 
-          controller.enqueue(`data: event ${i}\n\n`);
-          await new Promise(r => setTimeout(r, 100));
+          controller.enqueue(`data: event ${i}\\n\\n`);
+          await new Promise((r) => setTimeout(r, 100));
         }
 
         // Always close the stream (even if aborted)
@@ -91,8 +91,8 @@ export default {
       async start(controller) {
         try {
           for (let i = 0; i < 100; i++) {
-            controller.enqueue(`data: event ${i}\n\n`);
-            await new Promise(r => setTimeout(r, 100));
+            controller.enqueue(`data: event ${i}\\n\\n`);
+            await new Promise((r) => setTimeout(r, 100));
           }
           controller.close();
         } catch (error) {
@@ -113,12 +113,12 @@ export default {
 
 ## Behavior by Response Type
 
-| Response Type | Cancellation Detection | Resource Waste |
-|--------------|------------------------|----------------|
-| `new Response("json")` | N/A (one-shot) | None |
-| `ReadableStream` (user code) | `signal.aborted` or `enqueue()` throws | Minimal |
-| `fetch()` forward | Automatic via `__streamResponseBody` | None |
-| Processed fetch | Same as ReadableStream | Minimal |
+| Response Type                | Cancellation Detection                 | Resource Waste |
+| ---------------------------- | -------------------------------------- | -------------- |
+| `new Response("json")`       | N/A (one-shot)                         | None           |
+| `ReadableStream` (user code) | `signal.aborted` or `enqueue()` throws | Minimal        |
+| `fetch()` forward            | Automatic via `__streamResponseBody`   | None           |
+| Processed fetch              | Same as ReadableStream                 | Minimal        |
 
 ### Simple Response (No Streaming)
 
@@ -147,7 +147,7 @@ The runtime automatically stops reading from upstream when the client disconnect
 const stream = new ReadableStream({
   async start(controller) {
     while (hasMoreData()) {
-      if (controller.signal.aborted) break;  // Recommended
+      if (controller.signal.aborted) break; // Recommended
       controller.enqueue(getNextChunk());
     }
   }
@@ -163,16 +163,16 @@ const stream = new ReadableStream({
 The streaming response uses two channels:
 
 1. **StreamManager channel** - JS writes chunks via `__responseStreamWrite`, a spawned task reads them
-2. **ResponseBody channel** - The spawned task forwards chunks to actix for HTTP delivery
+2. **ResponseBody channel** - The spawned task forwards chunks to Hyper for HTTP delivery
 
 ```
 ┌──────────────┐    StreamManager     ┌──────────────┐    ResponseBody    ┌──────────┐
-│  JS Worker   │ ──── channel ─────▶ │ Spawned Task │ ──── channel ────▶ │  Actix   │
+│  JS Worker   │ ──── channel ─────▶  │ Spawned Task │ ──── channel ────▶ │  Hyper   │
 │  enqueue()   │                      │  (select!)   │                    │  HTTP    │
 └──────────────┘                      └──────────────┘                    └──────────┘
 ```
 
-When actix detects client disconnect (TCP write fails), it drops the ResponseBody receiver. The spawned task detects this via `tx.closed()` and calls `stream_manager.close_stream()`.
+When Hyper detects client disconnect (TCP write fails), `StreamBody` is dropped. The `Drop` implementation sends a notification via a oneshot channel, which triggers `stream_manager.close_stream()`.
 
 ### exec() Loop Detection
 
@@ -212,29 +212,29 @@ enqueue(chunk) {
 }
 ```
 
-### __streamResponseBody Detection
+### \_\_streamResponseBody Detection
 
 For fetch forward and processed responses:
 
 ```javascript
 // In worker.rs __streamResponseBody
 while (true) {
-    const { value, done } = await reader.read();
-    if (done) break;
+  const { value, done } = await reader.read();
+  if (done) break;
 
-    while (!__responseStreamWrite(streamId, chunk)) {
-        if (__responseStreamIsClosed(streamId)) {
-            cancelled = true;
-            break;  // Stop forwarding
-        }
-        await new Promise(r => setTimeout(r, 1));
+  while (!__responseStreamWrite(streamId, chunk)) {
+    if (__responseStreamIsClosed(streamId)) {
+      cancelled = true;
+      break; // Stop forwarding
     }
+    await new Promise((r) => setTimeout(r, 1));
+  }
 
-    if (cancelled) break;
+  if (cancelled) break;
 }
 
 if (cancelled) {
-    await reader.cancel('Client disconnected');
+  await reader.cancel('Client disconnected');
 }
 ```
 
@@ -325,7 +325,7 @@ async start(controller) {
 There is an inherent delay (typically 1-5 seconds) between when a client disconnects and when the worker detects it. This is due to:
 
 1. **TCP buffering** - Data is buffered at the OS level before being sent
-2. **HTTP chunked encoding** - Actix buffers chunks before writing to the socket
+2. **HTTP chunked encoding** - Hyper buffers chunks before writing to the socket
 3. **Write-based detection** - Disconnect is only detected when a write fails
 
 This is a fundamental limitation of HTTP streaming over TCP, not specific to OpenWorkers. The worker will eventually detect the disconnect and can then clean up.
@@ -355,9 +355,11 @@ timeout 2 curl -N 'https://your-worker.workers.dev/stream'
 
 ## Key Files
 
-| File | Purpose |
-|------|---------|
-| `openworkers-runtime-v8/src/worker.rs` | exec() loop cancellation detection |
-| `openworkers-runtime-v8/src/runtime/streams.rs` | ReadableStream with signal support |
-| `openworkers-runtime-v8/src/runtime/stream_manager.rs` | Rust-side channel management |
-| `openworkers-runtime-v8/src/runtime/bindings/streams.rs` | `__responseStreamIsClosed` binding |
+| File                                                     | Purpose                                                        |
+| -------------------------------------------------------- | -------------------------------------------------------------- |
+| `openworkers-core/src/http.rs`                           | `StreamBody` with `Drop` notification for disconnect detection |
+| `openworkers-runner/bin/main.rs`                         | Hyper HTTP server, passes disconnect channel to response       |
+| `openworkers-runtime-v8/src/worker.rs`                   | exec() loop cancellation detection                             |
+| `openworkers-runtime-v8/src/runtime/streams.rs`          | ReadableStream with signal support                             |
+| `openworkers-runtime-v8/src/runtime/stream_manager.rs`   | Rust-side channel management                                   |
+| `openworkers-runtime-v8/src/runtime/bindings/streams.rs` | `__responseStreamIsClosed` binding                             |
