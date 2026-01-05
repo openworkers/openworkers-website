@@ -318,6 +318,45 @@ async start(controller) {
 
 ---
 
+## Nginx Buffering
+
+If you're running OpenWorkers behind nginx (which is the default for self-hosted deployments), nginx will buffer streaming responses by default. This causes all chunks to arrive at once instead of incrementally.
+
+To disable buffering for streaming responses, add the `X-Accel-Buffering` header:
+
+```javascript
+export default {
+  async fetch(request, env, ctx) {
+    const stream = new ReadableStream({
+      async start(controller) {
+        for (let i = 0; i < 10; i++) {
+          if (controller.signal.aborted) {
+            console.log('Client disconnected');
+            break;
+          }
+
+          controller.enqueue(`data: event ${i}\n\n`);
+          await new Promise((r) => setTimeout(r, 100));
+        }
+
+        controller.close();
+      }
+    });
+
+    return new Response(stream, {
+      headers: {
+        'Content-Type': 'text/event-stream',
+        'X-Accel-Buffering': 'no'  // Disable nginx buffering
+      }
+    });
+  }
+};
+```
+
+This header tells nginx (and compatible proxies like Traefik) to pass chunks through immediately without buffering.
+
+---
+
 ## Known Limitations
 
 ### Detection Delay
