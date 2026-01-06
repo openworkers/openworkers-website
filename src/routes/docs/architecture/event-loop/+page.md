@@ -346,8 +346,11 @@ async fn exec(&mut self, task: Task) {
         // Check if response is ready
         if response_ready { break; }
 
-        // Yield to let scheduler run
-        tokio::time::sleep(duration).await;
+        // Wait for scheduler to signal callback ready (event-driven)
+        tokio::select! {
+            _ = callback_notify.notified() => {}  // Wake immediately
+            _ = tokio::time::sleep(100ms) => {}   // Periodic guard check
+        }
     }
 }
 ```
@@ -359,25 +362,26 @@ async fn exec(&mut self, task: Task) {
 │                        exec() loop                               │
 │                                                                  │
 │   ┌─────────┐    ┌───────────────────┐    ┌─────────┐            │
-│   │ Check   │───►│ process_callbacks │───►│ Check   │───► sleep  │
-│   │ timeout │    │ (try_recv)        │    │ ready   │            │
-│   └─────────┘    └───────────────────┘    └─────────┘            │
-│        │                  ▲                                      │
-│        │                  │ results                              │
+│   │ Check   │───►│ process_callbacks │───►│ Check   │───► select!│
+│   │ timeout │    │ (try_recv)        │    │ ready   │      │     │
+│   └─────────┘    └───────────────────┘    └─────────┘      │     │
+│        │                  ▲                                │     │
+│        │                  │ results + notify ◄─────────────┘     │
 │        │                  │                                      │
 │        ▼                  │                                      │
 │   ┌──────────────────────────────────────────────────────────┐   │
 │   │              Scheduler (background task)                 │   │
 │   │                                                          │   │
 │   │   recv() ──► spawn fetch ──► await reqwest ──► send()    │   │
+│   │                                               + notify   │   │
 │   └──────────────────────────────────────────────────────────┘   │
 └──────────────────────────────────────────────────────────────────┘
 ```
 
-- **Scheduler**: Handles async I/O (blocking `recv().await`)
-- **exec() loop**: Polls results, enforces timeouts, controls V8
+- **Scheduler**: Handles async I/O, notifies exec() when results are ready
+- **exec() loop**: Waits for notifications, enforces timeouts, controls V8
 
-The `sleep().await` in exec() is crucial - it yields control to tokio, allowing the scheduler to make progress on pending operations.
+The `select!` in exec() is event-driven: when the scheduler sends a callback, it also calls `notify_one()` to wake up the exec() loop immediately. No polling, no wasted CPU.
 
 ---
 
