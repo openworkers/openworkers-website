@@ -296,6 +296,91 @@ reader.read() ──► StreamRead(callback_id, stream_id)
 
 ---
 
+## Two Loops Architecture
+
+There are actually **two separate loops** that work together:
+
+### 1. Scheduler Loop (background task)
+
+Runs continuously in the background, spawning async tasks:
+
+```rust
+// runtime/mod.rs - run_event_loop()
+async fn run_event_loop(scheduler_rx, callback_tx, ops) {
+    loop {
+        select! {
+            msg = scheduler_rx.recv() => {
+                match msg {
+                    FetchStreaming(id, req) => {
+                        tokio::spawn(async {
+                            let result = ops.handle(Fetch(req)).await;
+                            callback_tx.send(FetchSuccess(id, result));
+                        });
+                    }
+                    ScheduleTimeout(id, ms) => { /* spawn timer */ }
+                }
+            }
+        }
+    }
+}
+```
+
+### 2. Execution Loop (in exec())
+
+Polls for results and checks termination conditions:
+
+```rust
+// worker.rs - exec()
+async fn exec(&mut self, task: Task) {
+    self.trigger_fetch_event(request);  // Start JS execution
+
+    for iteration in 0..5000 {
+        // Check termination (timeout, CPU limit)
+        if wall_guard.was_triggered() {
+            return Err(WallClockTimeout);
+        }
+
+        // Process available callbacks (NON-BLOCKING)
+        self.runtime.process_callbacks();
+
+        // Check if response is ready
+        if response_ready { break; }
+
+        // Yield to let scheduler run
+        tokio::time::sleep(duration).await;
+    }
+}
+```
+
+### Why Two Loops?
+
+```
+┌──────────────────────────────────────────────────────────────────┐
+│                        exec() loop                               │
+│                                                                  │
+│   ┌─────────┐    ┌───────────────────┐    ┌─────────┐            │
+│   │ Check   │───►│ process_callbacks │───►│ Check   │───► sleep  │
+│   │ timeout │    │ (try_recv)        │    │ ready   │            │
+│   └─────────┘    └───────────────────┘    └─────────┘            │
+│        │                  ▲                                      │
+│        │                  │ results                              │
+│        │                  │                                      │
+│        ▼                  │                                      │
+│   ┌──────────────────────────────────────────────────────────┐   │
+│   │              Scheduler (background task)                 │   │
+│   │                                                          │   │
+│   │   recv() ──► spawn fetch ──► await reqwest ──► send()    │   │
+│   └──────────────────────────────────────────────────────────┘   │
+└──────────────────────────────────────────────────────────────────┘
+```
+
+- **Scheduler**: Handles async I/O (blocking `recv().await`)
+- **exec() loop**: Polls results, enforces timeouts, controls V8
+
+The `sleep().await` in exec() is crucial - it yields control to tokio, allowing the scheduler to make progress on pending operations.
+
+---
+
 ## Integration Points
 
 ### process_callbacks()
@@ -311,7 +396,7 @@ pub fn process_callbacks(&mut self) {
     // 1. V8 internal tasks (Atomics, WebAssembly, etc.)
     while v8::Platform::pump_message_loop(platform, scope, false) {}
 
-    // 2. Our custom callbacks
+    // 2. Our custom callbacks (NON-BLOCKING: try_recv returns immediately)
     while let Ok(msg) = self.callback_rx.try_recv() {
         match msg { /* ... */ }
     }
@@ -320,6 +405,8 @@ pub fn process_callbacks(&mut self) {
     scope.perform_microtask_checkpoint();
 }
 ```
+
+**Important**: `try_recv()` is non-blocking - it returns `Err(Empty)` immediately if no messages are available. This allows the exec() loop to check for timeouts and response readiness without waiting.
 
 ### OperationsHandler
 
@@ -348,7 +435,8 @@ This allows the Runner to:
 
 | File                                                   | Purpose                                       |
 | ------------------------------------------------------ | --------------------------------------------- |
-| `openworkers-runtime-v8/src/runtime/mod.rs`            | Runtime struct, event loop, process_callbacks |
+| `openworkers-runtime-v8/src/worker.rs`                 | Worker struct, exec() loop                    |
+| `openworkers-runtime-v8/src/runtime/mod.rs`            | Runtime struct, scheduler, process_callbacks  |
 | `openworkers-runtime-v8/src/runtime/bindings/`         | Native V8 functions                           |
 | `openworkers-runtime-v8/src/runtime/stream_manager.rs` | Stream coordination                           |
 | `openworkers-core/src/ops.rs`                          | Operation, OperationResult enums              |
