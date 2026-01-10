@@ -2,12 +2,26 @@
   import '../app.css';
   import { page } from '$app/state';
   import { dev } from '$app/environment';
+  import { afterNavigate } from '$app/navigation';
+  import { browser } from '$app/environment';
 
   let { children } = $props();
 
   const loginUrl = 'https://dash.' + (dev ? 'dev.localhost' : 'openworkers.com') + '/sign-in';
 
   const isDocsPage = $derived(page.url.pathname.startsWith('/docs'));
+
+  // Track page views on navigation
+  if (browser) {
+    afterNavigate((navigation) => {
+      const gtag = (window as any).gtag;
+      if (typeof gtag === 'function') {
+        gtag('config', 'G-X7QPRFBML9', {
+          page_path: navigation.to?.url.pathname
+        });
+      }
+    });
+  }
 </script>
 
 <nav class="w-full bg-white px-4" class:fixed={isDocsPage} class:border-b={isDocsPage} class:shadow-sm={isDocsPage}>
