@@ -6,14 +6,14 @@ OpenWorkers executes JavaScript in V8 isolates with resource isolation. This doc
 
 ## Quick Summary
 
-| Layer          | Protection                                    | Default     |
-| -------------- | --------------------------------------------- | ----------- |
-| **Memory**     | V8 heap limits + custom ArrayBuffer allocator | 128 MB      |
-| **CPU Time**   | POSIX timer (Linux)                           | 100 ms      |
-| **Wall Clock** | Watchdog thread                               | 60 seconds  |
-| **Network**    | Fetch via operations handler                  | Controlled  |
-| **Filesystem** | Not exposed                                   | Blocked     |
-| **Processes**  | Not exposed                                   | Blocked     |
+| Layer          | Protection                                    | Default    |
+| -------------- | --------------------------------------------- | ---------- |
+| **Memory**     | V8 heap limits + custom ArrayBuffer allocator | 128 MB     |
+| **CPU Time**   | POSIX timer (Linux)                           | 100 ms     |
+| **Wall Clock** | Watchdog thread                               | 60 seconds |
+| **Network**    | Fetch via operations handler                  | Controlled |
+| **Filesystem** | Not exposed                                   | Blocked    |
+| **Processes**  | Not exposed                                   | Blocked    |
 
 ---
 
@@ -21,34 +21,34 @@ OpenWorkers executes JavaScript in V8 isolates with resource isolation. This doc
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                       JavaScript Code                            │
+│                       JavaScript Code                           │
 └─────────────────────────────────────────────────────────────────┘
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│                     V8 Isolate Sandbox                           │
-│                                                                  │
-│   • Separate heap per worker                                     │
-│   • No shared memory between isolates                            │
-│   • Limited API surface (no fs, no child_process)                │
+│                     V8 Isolate Sandbox                          │
+│                                                                 │
+│   • Separate heap per worker                                    │
+│   • No shared memory between isolates                           │
+│   • Limited API surface (no fs, no child_process)               │
 └─────────────────────────────────────────────────────────────────┘
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│                    Resource Limits                               │
-│                                                                  │
-│   • Memory: V8 heap + ArrayBuffer allocator                      │
-│   • CPU: POSIX timer (Linux) / Wall-clock fallback               │
-│   • Concurrency: Semaphore-controlled worker pool                │
+│                    Resource Limits                              │
+│                                                                 │
+│   • Memory: V8 heap + ArrayBuffer allocator                     │
+│   • CPU: POSIX timer (Linux) / Wall-clock fallback              │
+│   • Concurrency: Semaphore-controlled worker pool               │
 └─────────────────────────────────────────────────────────────────┘
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│                    Operations Handler                            │
-│                                                                  │
-│   • All I/O routed through Rust                                  │
-│   • Fetch requests validated/controlled                          │
-│   • Bindings resolve credentials server-side                     │
+│                    Operations Handler                           │
+│                                                                 │
+│   • All I/O routed through Rust                                 │
+│   • Fetch requests validated/controlled                         │
+│   • Bindings resolve credentials server-side                    │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -80,13 +80,13 @@ Worker tries to allocate 1GB ArrayBuffer
         │
         ▼
 ┌─────────────────────────────────────┐
-│    Custom ArrayBuffer Allocator      │
-│                                      │
-│    current: 50 MB                    │
-│    max: 128 MB                       │
-│    requested: 1024 MB                │
-│                                      │
-│    50 + 1024 > 128 → REJECT          │
+│    Custom ArrayBuffer Allocator     │
+│                                     │
+│    current: 50 MB                   │
+│    max: 128 MB                      │
+│    requested: 1024 MB               │
+│                                     │
+│    50 + 1024 > 128 → REJECT         │
 └─────────────────────────────────────┘
         │
         ▼
@@ -222,14 +222,16 @@ Workers have access to a limited set of Web APIs:
 
 The following are intentionally NOT available:
 
-| Feature             | Why Blocked                                  |
-| ------------------- | -------------------------------------------- |
-| **File System**     | No `fs`, no disk access                      |
-| **Child Processes** | No `spawn()`, `exec()`                       |
-| **Raw Sockets**     | No TCP/UDP, only HTTP via fetch              |
-| **Module System**   | No `require()`, no dynamic imports           |
-| **Environment**     | No `process.env` (use `env` binding instead) |
-| **System Calls**    | Rust boundary prevents libc access           |
+| Feature               | Why Blocked                                      |
+| --------------------- | ------------------------------------------------ |
+| **File System**       | No `fs`, no disk access                          |
+| **Child Processes**   | No `spawn()`, `exec()`                           |
+| **Raw Sockets**       | No TCP/UDP, only HTTP via fetch                  |
+| **Module System**     | No `require()`, no dynamic imports               |
+| **Environment**       | No `process.env` (use `env` binding instead)     |
+| **System Calls**      | Rust boundary prevents libc access               |
+| **SharedArrayBuffer** | Removed - can be used for Spectre timing attacks |
+| **Atomics**           | Removed - only useful with SharedArrayBuffer     |
 
 ---
 
@@ -248,12 +250,12 @@ SchedulerMessage::Fetch sent to event loop
         │
         ▼
 ┌─────────────────────────────────────┐
-│       Operations Handler             │
-│                                      │
+│       Operations Handler            │
+│                                     │
 │   • Validate URL (block localhost?) │
-│   • Enforce rate limits              │
-│   • Add timeout per request          │
-│   • Track bytes in/out               │
+│   • Enforce rate limits             │
+│   • Add timeout per request         │
+│   • Track bytes in/out              │
 └─────────────────────────────────────┘
         │
         ▼
@@ -401,12 +403,12 @@ pub struct RuntimeLimits {
 
 ### Environment Variables
 
-| Variable                | Description                    | Default        |
-| ----------------------- | ------------------------------ | -------------- |
-| `WORKER_POOL_SIZE`      | Thread count                   | CPU cores      |
-| `MAX_QUEUED_WORKERS`    | Max workers in queue           | pool_size × 10 |
-| `WORKER_WAIT_TIMEOUT_MS`| Timeout waiting for queue slot | 10000 (10s)    |
-| `RUNTIME_SNAPSHOT_PATH` | V8 snapshot blob               | None           |
+| Variable                 | Description                    | Default        |
+| ------------------------ | ------------------------------ | -------------- |
+| `WORKER_POOL_SIZE`       | Thread count                   | CPU cores      |
+| `MAX_QUEUED_WORKERS`     | Max workers in queue           | pool_size × 10 |
+| `WORKER_WAIT_TIMEOUT_MS` | Timeout waiting for queue slot | 10000 (10s)    |
+| `RUNTIME_SNAPSHOT_PATH`  | V8 snapshot blob               | None           |
 
 ---
 
@@ -414,14 +416,17 @@ pub struct RuntimeLimits {
 
 For security auditors:
 
-- [ ] V8 heap limits enforced (`runtime/mod.rs`)
-- [ ] ArrayBuffer allocator limits external memory (`security/array_buffer_allocator.rs`)
-- [ ] CPU enforcer terminates on timeout (`security/cpu_enforcer.rs`)
-- [ ] Wall-clock guard terminates on timeout (`security/timeout_guard.rs`)
-- [ ] Sequential worker pool ensures one isolate per thread (`worker_pool.rs`)
-- [ ] No filesystem APIs exposed
-- [ ] No child_process APIs exposed
-- [ ] Fetch routed through operations handler
-- [ ] Bindings resolve credentials server-side
-- [ ] Environment object is frozen
-- [ ] performance.now() precision reduced
+- [x] V8 heap limits enforced (`runtime/mod.rs`)
+- [x] ArrayBuffer allocator limits external memory (`security/array_buffer_allocator.rs`)
+- [x] CPU enforcer terminates on timeout (`security/cpu_enforcer.rs`)
+- [x] Wall-clock guard terminates on timeout (`security/timeout_guard.rs`)
+- [x] Sequential worker pool ensures one isolate per thread (`worker_pool.rs`)
+- [x] No filesystem APIs exposed
+- [x] No child_process APIs exposed
+- [x] Fetch routed through operations handler
+- [x] Bindings resolve credentials server-side
+- [x] Environment object is frozen
+- [x] `performance.now()` precision reduced to 100µs (`web_api.rs`)
+- [x] `SharedArrayBuffer` removed from globalThis (`web_api.rs`)
+- [x] `Atomics` removed from globalThis (`web_api.rs`)
+- [x] `Atomics.wait()` disabled at V8 level (`allow_atomics_wait(false)`)
