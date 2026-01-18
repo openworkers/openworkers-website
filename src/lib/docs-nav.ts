@@ -6,16 +6,19 @@ export interface NavItem {
 
 export const docsNav: NavItem[] = [
   {
-    name: 'Introduction',
+    name: 'Getting Started',
     path: '/docs',
     children: [
       { name: 'Overview', path: '/docs' },
-      { name: 'Runtime', path: '/docs/runtime' },
-      { name: 'Custom domains', path: '/docs/custom-domains' },
-      { name: 'Online editor', path: '/docs/online-editor' },
-      { name: 'Environment variables', path: '/docs/environment-variables' },
-      { name: 'Limits & Quotas', path: '/docs/limits' },
-      { name: 'Self-Hosting', path: '/docs/self-hosting' }
+      { name: 'Quick Start', path: '/docs/quickstart' }
+    ]
+  },
+  {
+    name: 'Workers',
+    path: '/docs/workers',
+    children: [
+      { name: 'HTTP Handlers', path: '/docs/workers/event-fetch' },
+      { name: 'Scheduled Tasks', path: '/docs/workers/scheduled-tasks' }
     ]
   },
   {
@@ -23,29 +26,41 @@ export const docsNav: NavItem[] = [
     path: '/docs/bindings',
     children: [
       { name: 'Overview', path: '/docs/bindings' },
-      { name: 'Storage', path: '/docs/bindings/storage' },
       { name: 'KV', path: '/docs/bindings/kv' },
+      { name: 'Storage', path: '/docs/bindings/storage' },
       { name: 'Database', path: '/docs/bindings/database' }
-    ]
-  },
-  {
-    name: 'Workers',
-    path: '/docs/workers',
-    children: [
-      { name: 'Handle HTTP requests', path: '/docs/workers/event-fetch' },
-      { name: 'Scheduled tasks', path: '/docs/workers/scheduled-tasks' }
     ]
   },
   {
     name: 'Examples',
     path: '/docs/examples',
     children: [
+      { name: 'Overview', path: '/docs/examples' },
+      { name: 'Hello World', path: '/docs/examples/hello-world' },
       { name: 'JSON API', path: '/docs/examples/json-api' },
-      { name: 'Redirect Service', path: '/docs/examples/redirect' },
+      { name: 'Form Handling', path: '/docs/examples/form-handling' },
+      { name: 'Authentication', path: '/docs/examples/authentication' },
       { name: 'CORS Proxy', path: '/docs/examples/cors-proxy' },
+      { name: 'Redirect Service', path: '/docs/examples/redirect' },
       { name: 'Telegram Bot', path: '/docs/examples/telegram' },
       { name: 'S3 Proxy', path: '/docs/examples/s3-proxy' },
-      { name: 'S3 Proxy (AWS v4)', path: '/docs/examples/s3-proxy-aws-v4' }
+      { name: 'S3 Proxy (v4)', path: '/docs/examples/s3-proxy-aws-v4' }
+    ]
+  },
+  {
+    name: 'Reference',
+    path: '/docs/runtime',
+    children: [
+      { name: 'Runtime APIs', path: '/docs/runtime' },
+      { name: 'Limits', path: '/docs/limits' },
+      { name: 'Custom Domains', path: '/docs/custom-domains' }
+    ]
+  },
+  {
+    name: 'Deployment',
+    path: '/docs/self-hosting',
+    children: [
+      { name: 'Self-Hosting', path: '/docs/self-hosting' }
     ]
   },
   {

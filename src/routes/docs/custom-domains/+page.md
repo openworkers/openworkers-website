@@ -1,9 +1,49 @@
-# Custom domains
+# Custom Domains
 
-You can add a custom domain to your worker in the "Domains" section of the worker overview page.
+Route your own domain to a worker.
 
-For example, for `example.com` to points to your worker, add `example.com` to the "Domains" section.
+## Setup
 
-Then, add a CNAME record to your DNS provider pointing to `workers.rocks`.
+1. Go to your worker's **Domains** tab
+2. Add your domain (e.g., `api.example.com`)
+3. Add a CNAME record at your DNS provider:
 
-Requests to `example.com` will now be routed to your worker.
+```
+api.example.com  CNAME  workers.rocks
+```
+
+4. Wait for DNS propagation (up to 24h, usually minutes)
+
+## SSL/TLS
+
+SSL certificates are provisioned automatically. Your domain will be accessible via HTTPS.
+
+## Apex Domains
+
+For apex domains (`example.com` without subdomain), use one of:
+
+- **ALIAS record** (if your DNS supports it)
+- **A record** pointing to our IP (contact support)
+- **Subdomain redirect** from `example.com` → `www.example.com`
+
+## Multiple Domains
+
+A worker can have multiple domains. All domains route to the same worker code.
+
+## Wildcard Domains
+
+Not currently supported. Create separate workers for each subdomain.
+
+## Troubleshooting
+
+**Domain not resolving:**
+- Verify CNAME is set correctly: `dig api.example.com CNAME`
+- DNS propagation can take time
+
+**SSL certificate error:**
+- New domains may take a few minutes for certificate provisioning
+- Ensure the domain resolves correctly first
+
+**404 on custom domain:**
+- Check the domain is added in the worker's Domains tab
+- Verify the worker is deployed and working on the default URL

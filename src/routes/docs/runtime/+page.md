@@ -2,6 +2,22 @@
 
 OpenWorkers implements standard Web APIs compatible with Cloudflare Workers and the WinterCG spec.
 
+## Contents
+
+- [Fetch API](#fetch-api) — fetch, Request, Response, Headers
+- [URL APIs](#url-apis) — URL, URLSearchParams
+- [Text Encoding](#text-encoding) — TextEncoder, TextDecoder, Base64
+- [Binary Data](#binary-data) — Blob, File, FormData
+- [Streams](#streams) — ReadableStream
+- [Crypto](#crypto) — Random, Hashing, HMAC
+- [Timers](#timers) — setTimeout, setInterval
+- [Abort Controller](#abort-controller) — Cancel operations
+- [Console](#console) — Logging
+- [Other APIs](#other-apis) — structuredClone, performance
+- [Limitations](#limitations) — What's not supported
+
+---
+
 ## Fetch API
 
 ### fetch()

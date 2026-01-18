@@ -4,16 +4,14 @@ Bindings connect your worker to external resources. They're injected via the `en
 
 ## Variables & Secrets
 
-Environment variables for configuration.
+Environment variables for configuration. Set them in the **Environments** tab of the dashboard.
 
 ```javascript
-const apiUrl = env.API_URL; // Variable (visible)
+const apiUrl = env.API_URL; // Variable (visible in logs)
 const apiKey = env.API_KEY; // Secret (hidden in logs)
 ```
 
-Configure in **Environments** in the dashboard.
-
-See [Environment Variables](/docs/environment-variables) for setup.
+**Variables** are visible in logs. **Secrets** are masked.
 
 ---
 
