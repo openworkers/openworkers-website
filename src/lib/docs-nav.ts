@@ -10,7 +10,8 @@ export const docsNav: NavItem[] = [
     path: '/docs',
     children: [
       { name: 'Overview', path: '/docs' },
-      { name: 'Quick Start', path: '/docs/quickstart' }
+      { name: 'Quick Start', path: '/docs/quickstart' },
+      { name: 'CLI', path: '/docs/cli' }
     ]
   },
   {

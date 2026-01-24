@@ -1,8 +1,69 @@
+<script>
+  import Tabs from '$lib/components/Tabs.svelte';
+</script>
+
 # KV Binding
 
 Key-value storage for small data with low latency. Ideal for caching, sessions, feature flags, and configuration.
 
 KV stores values as JSON natively — you can put strings, numbers, booleans, objects, and arrays directly without manual serialization.
+
+## Setup
+
+<Tabs tabs={['Dashboard', 'CLI', 'API']}>
+  {#snippet children(active)}
+    {#if active === 0}
+      <div>
+        <p>Go to <strong>KV</strong> in the sidebar and click <strong>New KV Namespace</strong>.</p>
+        <p>Enter a name (e.g., <code>my-cache</code>).</p>
+        <p>Then go to your worker's <strong>Environment</strong>, click <strong>Add Binding</strong> → select <strong>KV</strong>.</p>
+        <p>Set binding name (e.g., <code>KV</code>) and select your namespace.</p>
+      </div>
+    {:else if active === 1}
+      <div>
+
+```bash
+# Create KV namespace
+ow kv create my-cache
+
+# Create environment if needed
+ow env create my-env
+
+# Bind KV to environment
+ow env bind my-env KV my-cache --type kv
+
+# Link environment to worker
+ow workers link my-worker --env my-env
+```
+
+      </div>
+    {:else}
+      <div>
+
+```bash
+# Create KV namespace
+curl -X POST https://dash.openworkers.com/api/v1/kv \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"name": "my-cache"}'
+
+# Add binding to environment
+curl -X PATCH https://dash.openworkers.com/api/v1/environments/my-env \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "values": [{
+      "key": "KV",
+      "value": "<kv-id>",
+      "valueType": "kv"
+    }]
+  }'
+```
+
+      </div>
+    {/if}
+  {/snippet}
+</Tabs>
 
 ## Usage
 

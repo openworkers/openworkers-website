@@ -1,6 +1,74 @@
+<script>
+  import Tabs from '$lib/components/Tabs.svelte';
+</script>
+
 # Storage Binding
 
 Blob storage for files and binary data. Backed by S3-compatible object storage (AWS S3, Cloudflare R2, MinIO, etc.).
+
+## Setup
+
+<Tabs tabs={['Dashboard', 'CLI', 'API']}>
+  {#snippet children(active)}
+    {#if active === 0}
+      <div>
+        <p>Go to <strong>Storage</strong> in the sidebar and click <strong>New Storage Config</strong>.</p>
+        <p>Enter your S3/R2 credentials: bucket name, endpoint URL, access key ID, and secret access key.</p>
+        <p>Then go to your worker's <strong>Environment</strong>, click <strong>Add Binding</strong> → select <strong>Storage</strong>.</p>
+        <p>Set binding name (e.g., <code>STORAGE</code>) and select your config.</p>
+      </div>
+    {:else if active === 1}
+      <div>
+
+```bash
+# Create storage config
+ow storage create my-storage \
+  --bucket my-bucket \
+  --endpoint https://xxx.r2.cloudflarestorage.com \
+  --access-key-id AKIAIOSFODNN7EXAMPLE \
+  --secret-access-key wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+
+# Bind to environment
+ow env bind my-env STORAGE my-storage --type storage
+
+# Link environment to worker
+ow workers link my-worker --env my-env
+```
+
+      </div>
+    {:else}
+      <div>
+
+```bash
+# Create storage config
+curl -X POST https://dash.openworkers.com/api/v1/storage \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "my-storage",
+    "bucket": "my-bucket",
+    "endpoint": "https://xxx.r2.cloudflarestorage.com",
+    "accessKeyId": "AKIAIOSFODNN7EXAMPLE",
+    "secretAccessKey": "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
+  }'
+
+# Add binding to environment
+curl -X PATCH https://dash.openworkers.com/api/v1/environments/my-env \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "values": [{
+      "key": "STORAGE",
+      "value": "<storage-id>",
+      "valueType": "storage"
+    }]
+  }'
+```
+
+      </div>
+    {/if}
+  {/snippet}
+</Tabs>
 
 ## Usage
 
