@@ -48,6 +48,15 @@ export const docsNav: NavItem[] = [
     ]
   },
   {
+    name: 'Frameworks',
+    path: '/docs/frameworks',
+    children: [
+      { name: 'Overview', path: '/docs/frameworks' },
+      { name: 'SvelteKit', path: '/docs/frameworks/sveltekit' },
+      { name: 'React', path: '/docs/frameworks/react' }
+    ]
+  },
+  {
     name: 'Reference',
     path: '/docs/runtime',
     children: [
