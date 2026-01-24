@@ -124,7 +124,7 @@ dist/
 ### Link Environment
 
 ```bash
-ow workers link <worker-name> --env <environment-name>
+ow workers link <worker-name> <environment-name>
 ```
 
 ---
