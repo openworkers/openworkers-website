@@ -33,6 +33,15 @@ export const docsNav: NavItem[] = [
     ]
   },
   {
+    name: 'Frameworks',
+    path: '/docs/frameworks',
+    children: [
+      { name: 'Overview', path: '/docs/frameworks' },
+      { name: 'SvelteKit', path: '/docs/frameworks/sveltekit' },
+      { name: 'Static Sites', path: '/docs/frameworks/static' }
+    ]
+  },
+  {
     name: 'Examples',
     path: '/docs/examples',
     children: [
@@ -46,15 +55,6 @@ export const docsNav: NavItem[] = [
       { name: 'Telegram Bot', path: '/docs/examples/telegram' },
       { name: 'S3 Proxy', path: '/docs/examples/s3-proxy' },
       { name: 'S3 Proxy (v4)', path: '/docs/examples/s3-proxy-aws-v4' }
-    ]
-  },
-  {
-    name: 'Frameworks',
-    path: '/docs/frameworks',
-    children: [
-      { name: 'Overview', path: '/docs/frameworks' },
-      { name: 'SvelteKit', path: '/docs/frameworks/sveltekit' },
-      { name: 'React', path: '/docs/frameworks/react' }
     ]
   },
   {
