@@ -1,5 +1,6 @@
 <script lang="ts">
   import Console from '$lib/components/Console.svelte';
+  import Showcase from '$lib/components/Showcase.svelte';
 
   const loginUrl = 'https://dash.openworkers.com/sign-in';
 
@@ -7,6 +8,39 @@
 
   let email = $state('');
   let status = $state<'idle' | 'loading' | 'success' | 'error'>('idle');
+
+  const showcases = [
+    {
+      title: 'time.workers.rocks',
+      description: 'Application with SSR-rendered clocks. Clock hands are positioned at load time.',
+      url: 'https://time.workers.rocks',
+      screenshot: 'https://cdn.optimage.cloud/jSskR2oYmZSZ/512/time.webp'
+    },
+    {
+      title: 'httpbin.workers.rocks',
+      description: 'A replica of the famous httpbin tool for testing HTTP requests.',
+      url: 'https://httpbin.workers.rocks',
+      screenshot: 'https://cdn.optimage.cloud/jSskR2oYmZSZ/512/httpbin.webp'
+    },
+    {
+      title: 'ip-info.workers.rocks',
+      description: 'Quick and dirty IP information lookup tool.',
+      url: 'https://ip-info.workers.rocks',
+      screenshot: 'https://cdn.optimage.cloud/jSskR2oYmZSZ/512/ip-info.webp'
+    },
+    {
+      title: 'qr-code.workers.rocks',
+      description: 'Embedded QR code generator.',
+      url: 'https://qr-code.workers.rocks/qr?content=https://qr-code.workers.rocks/',
+      screenshot: 'https://cdn.optimage.cloud/jSskR2oYmZSZ/qr-code.svg'
+    },
+    {
+      title: 'sveltekit.workers.rocks',
+      description: 'SvelteKit app demo with server-side rendering.',
+      url: 'https://sveltekit.workers.rocks/demo',
+      screenshot: 'https://cdn.optimage.cloud/jSskR2oYmZSZ/512/sveltekit.webp'
+    }
+  ];
 
   async function subscribe(e: SubmitEvent) {
     e.preventDefault();
@@ -91,6 +125,26 @@
             Read Documentation
           </a>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container my-24 max-w-7xl">
+    <div class="px-8">
+      <h2 class="mb-4 text-center text-3xl font-bold text-slate-800">Built with OpenWorkers</h2>
+      <p class="mx-auto mb-12 max-w-2xl text-center text-slate-600">
+        Real-world examples running in production. See what you can build with OpenWorkers.
+      </p>
+
+      <div class="grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-3">
+        {#each showcases as showcase}
+          <Showcase
+            title={showcase.title}
+            description={showcase.description}
+            url={showcase.url}
+            screenshot={showcase.screenshot}
+          />
+        {/each}
       </div>
     </div>
   </div>
