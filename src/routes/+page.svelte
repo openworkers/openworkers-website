@@ -23,12 +23,6 @@
       screenshot: 'https://cdn.optimage.cloud/jSskR2oYmZSZ/512/httpbin.webp'
     },
     {
-      title: 'ip-info.workers.rocks',
-      description: 'Quick and dirty IP information lookup tool.',
-      url: 'https://ip-info.workers.rocks',
-      screenshot: 'https://cdn.optimage.cloud/jSskR2oYmZSZ/512/ip-info.webp'
-    },
-    {
       title: 'qr-code.workers.rocks',
       description: 'Embedded QR code generator.',
       url: 'https://qr-code.workers.rocks/qr?content=https://qr-code.workers.rocks/',
@@ -39,6 +33,18 @@
       description: 'SvelteKit app demo with server-side rendering.',
       url: 'https://sveltekit.workers.rocks/demo',
       screenshot: 'https://cdn.optimage.cloud/jSskR2oYmZSZ/512/sveltekit.webp'
+    },
+    {
+      title: 'rock-paper-scissors.workers.rocks',
+      description: 'Provably fair Rock Paper Scissors game',
+      url: 'https://rock-paper-scissors.workers.rocks',
+      screenshot: 'https://cdn.optimage.cloud/jSskR2oYmZSZ/512/rock-paper-scissors.webp'
+    },
+    {
+      title: 'ip-info.workers.rocks',
+      description: 'Simple IP information lookup tool.',
+      url: 'https://ip-info.workers.rocks',
+      screenshot: 'https://cdn.optimage.cloud/jSskR2oYmZSZ/512/ip-info.webp'
     }
   ];
 

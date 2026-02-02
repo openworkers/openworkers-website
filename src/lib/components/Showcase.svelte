@@ -9,9 +9,7 @@
   let { title, description, url, screenshot }: Props = $props();
 </script>
 
-<div
-  class="overflow-hidden rounded-xl border border-slate-100 bg-white shadow-[0_5px_20px_#0001]"
->
+<div class="overflow-hidden rounded-xl border border-slate-100 bg-white shadow-[0_5px_20px_#0001]">
   <div class="relative flex h-10 items-center justify-between border-b border-slate-100 px-4">
     <div class="flex items-center space-x-2">
       <div class="h-3 w-3 rounded-full bg-slate-200"></div>
@@ -19,8 +17,12 @@
       <div class="h-3 w-3 rounded-full bg-slate-200"></div>
     </div>
 
-    <div class="absolute left-1/2 -translate-x-1/2 text-sm text-slate-400">
-      {title}
+    <div
+      class="absolute left-1/2 -translate-x-1/2 text-sm max-w-44 truncate ellipsis overflow-hidden whitespace-nowrap text-blue-500 hover:text-blue-600"
+    >
+      <a href={url} target="_blank" rel="noopener noreferrer" class="underline hover:text-slate-600">
+        {title}
+      </a>
     </div>
   </div>
 
