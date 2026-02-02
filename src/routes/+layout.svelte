@@ -25,11 +25,11 @@
 </script>
 
 <nav class="w-full bg-white px-4" class:fixed={isDocsPage} class:border-b={isDocsPage} class:shadow-sm={isDocsPage}>
-  <div class="container h-16 max-w-8xl items-center justify-between">
+  <div class="container h-16 max-w-7xl items-center justify-between">
     <div class="flex flex-1 gap-2">
       <a href="/">
-        <img class="hidden h-8 xs:block" src="https://arq.pw/public/long-black-2.svg" alt="logo" />
-        <img class="block h-8 xs:hidden" src="https://arq.pw/public/icon-black.svg" alt="logo" />
+        <img class="hidden h-8 xs:block" src="/icon-black-long.svg" alt="logo" />
+        <img class="block h-8 xs:hidden" src="/icon-black.svg" alt="logo" />
       </a>
     </div>
 

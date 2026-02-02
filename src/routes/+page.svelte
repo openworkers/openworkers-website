@@ -34,12 +34,15 @@
   />
 </svelte:head>
 
-<div class="min-h-screen">
+<div class="min-h-[calc(100vh-18rem)]">
   <div class="container mt-24 max-w-7xl flex-col">
-    <div class="flex w-full flex-col justify-between px-8 lg:flex-row lg:gap-8">
-      <div class="mx-auto max-w-xl flex-1">
+    <div class="flex w-full flex-col justify-between gap-8 px-8 xl:flex-row xl:flex-wrap">
+      <!-- Block 1 -->
+      <div class="order-1 mx-auto max-w-xl xl:order-1 xl:flex-1">
         <div>
-          <div class="mb-6 inline-flex items-center rounded-full border border-blue-100 bg-blue-50 px-3 py-1 text-sm font-medium text-blue-600">
+          <div
+            class="mb-6 inline-flex items-center rounded-full border border-blue-100 bg-blue-50 px-3 py-1 text-sm font-medium text-blue-600"
+          >
             Now in public beta
           </div>
 
@@ -48,7 +51,7 @@
           </h1>
 
           <div class="my-12 flex">
-            <ul class="list-checkmark mx-auto lg:mx-0">
+            <ul class="list-checkmark mx-auto xl:mx-0">
               <li>Schedule jobs and build powerful flows</li>
               <li>Built-in monitoring</li>
               <li>Scale with ease</li>
@@ -57,19 +60,11 @@
               <li>Easily bind your domains to workers</li>
             </ul>
           </div>
-
-          <div class="flex flex-col gap-4 sm:flex-row">
-            <a href={loginUrl} target="_blank" class="btn btn-blue rounded px-6 py-4 text-xl">
-              Get Started
-            </a>
-            <a href="/docs" class="btn rounded border border-slate-200 bg-white px-6 py-4 text-xl text-slate-700 hover:bg-slate-50">
-              Read Documentation
-            </a>
-          </div>
         </div>
       </div>
 
-      <div class="mx-auto max-w-xl flex-1">
+      <!-- Console -->
+      <div class="order-3 mx-auto max-w-xl xl:order-2 xl:flex-1">
         <Console title="hello.ts" content={data.codeHtml}>
           {#snippet footer()}
             <div class="flex items-center justify-between px-6 py-3">
@@ -83,6 +78,19 @@
             </div>
           {/snippet}
         </Console>
+      </div>
+
+      <!-- Buttons -->
+      <div class="order-2 mx-auto w-full xl:order-3 xl:max-w-none">
+        <div class="flex flex-col gap-4 md:flex-row justify-center">
+          <a href={loginUrl} target="_blank" class="btn btn-blue rounded px-7 py-4 text-xl"> Get Started </a>
+          <a
+            href="/docs"
+            class="btn rounded border border-slate-200 bg-white px-7 py-4 text-xl text-slate-700 hover:bg-slate-50"
+          >
+            Read Documentation
+          </a>
+        </div>
       </div>
     </div>
   </div>
@@ -133,28 +141,30 @@
       </div>
     </div>
   </div>
-
-  <footer class="border-t border-slate-200">
-    <div class="container max-w-7xl flex-col items-center py-12 md:flex-row md:justify-between">
-      <div class="mb-4 flex items-baseline gap-4 md:mb-0">
-        <span class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-slate-800 to-slate-600">OpenWorkers</span>
-        <span class="text-sm text-slate-500">© {new Date().getFullYear()} OpenWorkers</span>
-      </div>
-
-      <div class="flex gap-8">
-        <a href="https://github.com/openworkers" target="_blank" class="group">
-          <span class="sr-only">GitHub</span>
-          <img src="/github.svg" alt="github" class="h-6 w-6 opacity-60 transition-opacity group-hover:opacity-100" />
-        </a>
-        <a href="https://t.me/openworkers" target="_blank" class="group">
-          <span class="sr-only">Telegram</span>
-          <img src="/telegram.svg" alt="telegram" class="h-6 w-6 opacity-60 transition-opacity group-hover:opacity-100" />
-        </a>
-        <a href="https://twitter.com/openworkers" target="_blank" class="group">
-          <span class="sr-only">Twitter</span>
-          <img src="/twitter.svg" alt="twitter" class="h-6 w-6 opacity-60 transition-opacity group-hover:opacity-100" />
-        </a>
-      </div>
-    </div>
-  </footer>
 </div>
+
+<footer class="border-t border-slate-200">
+  <div class="container max-w-7xl flex-col items-center py-12 md:flex-row md:justify-between">
+    <div class="mb-4 flex items-baseline gap-4 md:mb-0">
+      <span class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-slate-800 to-slate-600"
+        >OpenWorkers</span
+      >
+      <span class="text-sm text-slate-500">© {new Date().getFullYear()} OpenWorkers</span>
+    </div>
+
+    <div class="flex gap-8">
+      <a href="https://github.com/openworkers" target="_blank" class="group">
+        <span class="sr-only">GitHub</span>
+        <img src="/github.svg" alt="github" class="h-6 w-6 opacity-60 transition-opacity group-hover:opacity-100" />
+      </a>
+      <a href="https://t.me/openworkers" target="_blank" class="group">
+        <span class="sr-only">Telegram</span>
+        <img src="/telegram.svg" alt="telegram" class="h-6 w-6 opacity-60 transition-opacity group-hover:opacity-100" />
+      </a>
+      <a href="https://twitter.com/openworkers" target="_blank" class="group">
+        <span class="sr-only">Twitter</span>
+        <img src="/twitter.svg" alt="twitter" class="h-6 w-6 opacity-60 transition-opacity group-hover:opacity-100" />
+      </a>
+    </div>
+  </div>
+</footer>
