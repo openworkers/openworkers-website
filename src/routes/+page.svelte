@@ -14,13 +14,15 @@
       title: 'time.workers.rocks',
       description: 'Application with SSR-rendered clocks. Clock hands are positioned at load time.',
       url: 'https://time.workers.rocks',
-      screenshot: 'https://cdn.optimage.cloud/jSskR2oYmZSZ/512/time.webp'
+      screenshot: 'https://cdn.optimage.cloud/jSskR2oYmZSZ/512/time.webp',
+      source: 'https://github.com/max-lt/world-time-app'
     },
     {
       title: 'httpbin.workers.rocks',
       description: 'A replica of the famous httpbin tool for testing HTTP requests.',
       url: 'https://httpbin.workers.rocks',
-      screenshot: 'https://cdn.optimage.cloud/jSskR2oYmZSZ/512/httpbin.webp'
+      screenshot: 'https://cdn.optimage.cloud/jSskR2oYmZSZ/512/httpbin.webp',
+      source: 'https://github.com/max-lt/httpbin'
     },
     {
       title: 'qr-code.workers.rocks',
@@ -38,7 +40,8 @@
       title: 'rock-paper-scissors.workers.rocks',
       description: 'Provably fair Rock Paper Scissors game',
       url: 'https://rock-paper-scissors.workers.rocks',
-      screenshot: 'https://cdn.optimage.cloud/jSskR2oYmZSZ/512/rock-paper-scissors.webp'
+      screenshot: 'https://cdn.optimage.cloud/jSskR2oYmZSZ/512/rock-paper-scissors.webp',
+      source: 'https://github.com/max-lt/rock-paper-scissors'
     },
     {
       title: 'ip-info.workers.rocks',
@@ -149,6 +152,7 @@
             description={showcase.description}
             url={showcase.url}
             screenshot={showcase.screenshot}
+            source={showcase.source}
           />
         {/each}
       </div>
