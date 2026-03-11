@@ -6,7 +6,7 @@
       "name": "app",
       "devDependencies": {
         "@openworkers/adapter-static": "^0.1.3",
-        "@openworkers/adapter-sveltekit": "^0.3.6",
+        "@openworkers/adapter-sveltekit": "^0.5.6",
         "@sveltejs/adapter-auto": "^7.0.0",
         "@sveltejs/adapter-static": "^3.0.10",
         "@sveltejs/kit": "^2.49.1",
@@ -96,7 +96,7 @@
 
     "@openworkers/adapter-static": ["@openworkers/adapter-static@0.1.3", "", { "dependencies": { "esbuild": "^0.27.2", "mime": "^4.1.0" }, "bin": { "adapter-static": "bin/cli.js" } }, "sha512-3TLyrcxO/xLrA67xqV2HH/McuJ79JRYkGG3Kt9jiIdqCiRgFpESXI9rZ/jxbcjuiWCngryskrhQIqgrAc5MO8Q=="],
 
-    "@openworkers/adapter-sveltekit": ["@openworkers/adapter-sveltekit@0.3.6", "", { "dependencies": { "esbuild": "^0.27.2" }, "peerDependencies": { "@sveltejs/kit": "^2.0.0" } }, "sha512-I1SoVnN8BkJt4TsBhbDBbrZNobuivq4GrFPpjeXCHBaGErjm/BO+yS5qfCabia0RipD1zcMGS38rVraGGhHJfg=="],
+    "@openworkers/adapter-sveltekit": ["@openworkers/adapter-sveltekit@0.5.6", "", { "dependencies": { "esbuild": "^0.27.2" }, "peerDependencies": { "@sveltejs/kit": "^2.0.0" } }, "sha512-9uHmzPBTO+2wMav/mwq6H9c2AaXecDmXokBj4FhhlGQJFruL8IkNQWQpSd8118F3Az9Pat/cffjGGFn50YjhmA=="],
 
     "@polka/url": ["@polka/url@1.0.0-next.29", "", {}, "sha512-wwQAWhWSuHaag8c4q/KN/vCoeOJYshAIvMQwD4GpSb3OiZklFfvAgmj0VCBBImRpuF/aFgIRzllXlVX93Jevww=="],
 
