@@ -1,3 +1,4 @@
+import openworkersAdapter from '@openworkers/adapter-sveltekit';
 import adapter from '@sveltejs/adapter-static';
 import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
 import { mdsvex } from 'mdsvex';
@@ -8,6 +9,11 @@ const highlighter = await createHighlighter({
   themes: ['github-light'],
   langs: ['javascript', 'typescript', 'bash', 'json', 'html', 'css', 'svelte', 'rust', 'sql', 'yaml', 'toml']
 });
+
+// Toggle between Openworkers adapter and static adapter
+// with arg --openworkers
+const useOpenworkersAdapter = process.argv.includes('--openworkers');
+console.log(`Using ${useOpenworkersAdapter ? 'Openworkers Sveltekit' : 'Sveltekit Static'} adapter`);
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
@@ -35,13 +41,18 @@ const config = {
   ],
 
   kit: {
-    adapter: adapter({
-      pages: 'build',
-      assets: 'build',
-      fallback: '404.html',
-      precompress: false,
-      strict: true
-    }),
+    adapter: useOpenworkersAdapter
+      ? openworkersAdapter({
+          out: 'dist',
+          functions: true
+        })
+      : adapter({
+          pages: 'build',
+          assets: 'build',
+          fallback: '404.html',
+          precompress: false,
+          strict: true
+        }),
     paths: {
       base: ''
     },

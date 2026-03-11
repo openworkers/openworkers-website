@@ -216,7 +216,12 @@
       <span class="text-sm text-slate-500">© {new Date().getFullYear()} OpenWorkers</span>
     </div>
 
-    <div class="flex gap-8">
+    <div class="flex items-center gap-6">
+      <a href="/terms-of-service" class="text-sm text-slate-500 hover:text-slate-700">Terms</a>
+      <a href="/privacy-policy" class="text-sm text-slate-500 hover:text-slate-700">Privacy</a>
+
+      <span class="text-slate-300">|</span>
+
       <a href="https://github.com/openworkers" target="_blank" class="group">
         <span class="sr-only">GitHub</span>
         <img src="/github.svg" alt="github" class="h-6 w-6 opacity-60 transition-opacity group-hover:opacity-100" />

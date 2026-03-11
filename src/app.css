@@ -151,12 +151,26 @@
   .markdown-body h4,
   .markdown-body h5,
   .markdown-body h6 {
-    @apply border-b pb-1;
-    font-weight: 600;
+    @apply pb-1;
     scroll-margin-top: 6rem;
   }
 
-  .markdown-body > * {
+  .markdown-body h1 {
+    @apply text-2xl border-b font-semibold;
+  }
+
+  .markdown-body h2 {
+    @apply text-xl border-b font-semibold;
+  }
+
+  .markdown-body h3 {
+    @apply text-sm font-semibold;
+  }
+
+  .markdown-body > *,
+  .markdown-body p,
+  .markdown-body h1,
+  .markdown-body h2 {
     @apply mb-4;
   }
 
