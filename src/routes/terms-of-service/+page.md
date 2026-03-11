@@ -1,12 +1,14 @@
 <svelte:head>
+
   <title>Terms of Service - OpenWorkers</title>
 </svelte:head>
 
-<div class="mx-auto max-w-3xl px-6 py-16 markdown-body">
+<div class="mx-auto max-w-7xl">
+<div class="max-w-3xl px-6 py-16 markdown-body">
 
 # Terms of Service
 
-*Last updated: March 11, 2026*
+_Last updated: March 11, 2026_
 
 ## 1. Acceptance
 
@@ -65,4 +67,5 @@ We may update these terms at any time. Continued use of the Service after change
 
 For questions about these terms, reach out via [GitHub](https://github.com/openworkers) or [Telegram](https://t.me/openworkers).
 
+</div>
 </div>

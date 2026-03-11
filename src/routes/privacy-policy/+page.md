@@ -3,7 +3,8 @@
   <title>Privacy Policy - OpenWorkers</title>
 </svelte:head>
 
-<div class="mx-auto max-w-3xl px-6 py-16 markdown-body">
+<div class="mx-auto max-w-7xl">
+<div class="max-w-3xl px-6 py-16 markdown-body">
 
 # Privacy Policy
 
@@ -69,4 +70,5 @@ We may update this policy at any time. Changes will be reflected in the "Last up
 
 For privacy-related questions, reach out via [GitHub](https://github.com/openworkers) or [Telegram](https://t.me/openworkers).
 
+</div>
 </div>
