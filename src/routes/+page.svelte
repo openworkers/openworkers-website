@@ -172,7 +172,7 @@
               <p class="w-full text-right text-red-600">Failed to subscribe. Please try again.</p>
             {/if}
 
-            <div class="relative max-w-[24rem] flex-1 rounded-lg border border-slate-200 lg:max-w-[32rem]">
+            <div class="relative max-w-[24rem] flex-1 rounded-lg border border-slate-200 lg:max-w-lg">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -210,9 +210,9 @@
 <footer class="border-t border-slate-200">
   <div class="container max-w-7xl flex-col items-center py-12 md:flex-row md:justify-between">
     <div class="mb-4 flex items-baseline gap-4 md:mb-0">
-      <span class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-slate-800 to-slate-600"
-        >OpenWorkers</span
-      >
+      <span class="text-xl font-bold bg-clip-text text-transparent bg-linear-to-r from-slate-800 to-slate-600">
+        OpenWorkers
+      </span>
       <span class="text-sm text-slate-500">© {new Date().getFullYear()} OpenWorkers</span>
     </div>
 

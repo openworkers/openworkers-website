@@ -164,7 +164,7 @@
   }
 
   .markdown-body h3 {
-    @apply text-sm font-semibold;
+    @apply text-base font-semibold;
   }
 
   .markdown-body > *,
