@@ -19,7 +19,8 @@ export const docsNav: NavItem[] = [
     path: '/docs/workers',
     children: [
       { name: 'HTTP Handlers', path: '/docs/workers/event-fetch' },
-      { name: 'Scheduled Tasks', path: '/docs/workers/scheduled-tasks' }
+      { name: 'Scheduled Tasks', path: '/docs/workers/scheduled-tasks' },
+      { name: 'WebSockets', path: '/docs/workers/websockets' }
     ]
   },
   {
