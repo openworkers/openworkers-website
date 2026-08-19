@@ -10,6 +10,7 @@
   const loginUrl = 'https://dash.' + (dev ? 'dev.localhost' : 'openworkers.com') + '/sign-in';
 
   const isDocsPage = $derived(page.url.pathname.startsWith('/docs'));
+  const isBlogPage = $derived(page.url.pathname.startsWith('/blog'));
 
   // Track page views on navigation
   if (browser) {
@@ -39,6 +40,7 @@
         <img src="/github.svg" alt="GitHub" class="h-5 w-5 opacity-60 transition-opacity group-hover:opacity-100" />
       </a>
       <a class="link" class:active={isDocsPage} href="/docs">Docs</a>
+      <a class="link" class:active={isBlogPage} href="/blog">Blog</a>
       <a class="link" href={loginUrl} target="_blank">Sign in</a>
     </div>
   </div>
