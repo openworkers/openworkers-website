@@ -4,19 +4,6 @@ date: '2026-08-20'
 description: A Cloudflare workers-rs app, one Cargo rename, zero JS glue - served as a native WASM component. Then Go, and what its numbers teach.
 ---
 
-<svelte:head>
-
-  <title>Running workers-rs without JavaScript - OpenWorkers Blog</title>
-  <meta name="description" content="A Cloudflare workers-rs app, one Cargo rename, zero JS glue - served as a native WASM component. Then Go, and what its numbers teach." />
-</svelte:head>
-
-<div class="mx-auto max-w-7xl">
-<div class="max-w-3xl px-6 py-16 markdown-body">
-
-# Running workers-rs without JavaScript
-
-_2026-08-20_
-
 Rust on Cloudflare Workers is Rust compiled to WASM, wrapped in generated
 JavaScript glue, executed inside V8. The `worker` crate talks to the platform
 through `wasm-bindgen`, which means a JS engine sits between your Rust and
@@ -111,5 +98,3 @@ resolvers happily run older imports against newer implementations - so the
 version you declare in a WIT world is a floor for your guests, and the lower
 you can declare it, the more toolchains can target you unmodified.
 
-</div>
-</div>

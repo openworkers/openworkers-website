@@ -4,19 +4,6 @@ date: '2026-08-19'
 description: Upstream landed the isolate locker our fork existed for. What migrating six V8 majors actually broke, and what a fork should shrink to.
 ---
 
-<svelte:head>
-
-  <title>Retiring a rusty_v8 fork - OpenWorkers Blog</title>
-  <meta name="description" content="Upstream landed the isolate locker our fork existed for. What migrating six V8 majors actually broke, and what a fork should shrink to." />
-</svelte:head>
-
-<div class="mx-auto max-w-7xl">
-<div class="max-w-3xl px-6 py-16 markdown-body">
-
-# Retiring a rusty_v8 fork
-
-_2026-08-19_
-
 OpenWorkers pools V8 isolates across threads: an isolate is created once,
 parked, and locked by whichever thread serves the next request. Upstream
 rusty_v8 removed its `v8::Locker` bindings years ago, so we carried a fork
@@ -81,5 +68,3 @@ ship must match the `set_common_data_NN` symbol of the ICU your engine links.
 Every engine bump now includes a data-file bump. Written down here so the
 next one is a step, not an investigation.
 
-</div>
-</div>

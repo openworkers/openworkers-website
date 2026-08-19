@@ -4,19 +4,6 @@ date: '2026-08-19'
 description: How a conformance oracle made five JavaScript engines render the same SvelteKit page byte-for-byte, and what it caught along the way.
 ---
 
-<svelte:head>
-
-  <title>Five engines, one page, one sha256 - OpenWorkers Blog</title>
-  <meta name="description" content="How a conformance oracle made five JavaScript engines render the same SvelteKit page byte-for-byte, and what it caught along the way." />
-</svelte:head>
-
-<div class="mx-auto max-w-7xl">
-<div class="max-w-3xl px-6 py-16 markdown-body">
-
-# Five engines, one page, one sha256
-
-_2026-08-19_
-
 OpenWorkers runs workers on more than one JavaScript engine: V8 in production,
 plus JavaScriptCore, QuickJS, Boa and Nova behind the same `Worker` trait.
 "Compatible" is easy to claim across five engines and hard to define. So we
@@ -87,5 +74,3 @@ The suite exits non-zero only when the harness itself breaks. Failing guest
 assertions are the product, not an error: a scoreboard you can only look at
 when it is green is a scoreboard you will never look at.
 
-</div>
-</div>

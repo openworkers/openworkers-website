@@ -4,19 +4,6 @@ date: '2026-08-20'
 description: Startup snapshots save 6%, per-script code caches save 62%. Where the time actually goes when a worker wakes to render a page.
 ---
 
-<svelte:head>
-
-  <title>Anatomy of a V8 cold start - OpenWorkers Blog</title>
-  <meta name="description" content="Startup snapshots save 6%, per-script code caches save 62%. Where the time actually goes when a worker wakes to render a page." />
-</svelte:head>
-
-<div class="mx-auto max-w-7xl">
-<div class="max-w-3xl px-6 py-16 markdown-body">
-
-# Anatomy of a V8 cold start
-
-_2026-08-20_
-
 The workload that matters for a workers platform is not a benchmark loop. It
 is: wake a worker, server-side render a page, return the bytes, go back to
 sleep. We measured that cycle on a real 303 KB SvelteKit server bundle,
@@ -92,5 +79,3 @@ idle worker holds about 2.2 MB of resident memory. At those numbers the
 bottleneck is not wake latency any more - it is memory per sleeping worker.
 Optimizing cold starts further buys little; the next fight is footprint.
 
-</div>
-</div>

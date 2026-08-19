@@ -4,10 +4,14 @@ import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
 import { mdsvex } from 'mdsvex';
 import { createHighlighter } from 'shiki';
 import rehypeSlug from 'rehype-slug';
+import { fileURLToPath } from 'node:url';
+
+// mdsvex resolves layout paths relative to each .md file, so they must be absolute
+const blogLayout = fileURLToPath(new URL('./src/lib/blog/PostLayout.svelte', import.meta.url));
 
 const highlighter = await createHighlighter({
-  themes: ['github-light'],
-  langs: ['javascript', 'typescript', 'bash', 'json', 'html', 'css', 'svelte', 'rust', 'sql', 'yaml', 'toml']
+  themes: ['github-light', 'github-dark'],
+  langs: ['javascript', 'typescript', 'bash', 'json', 'html', 'css', 'svelte', 'rust', 'sql', 'yaml', 'toml', 'go']
 });
 
 // Toggle between Openworkers adapter and static adapter
@@ -23,15 +27,16 @@ const config = {
     vitePreprocess(),
     mdsvex({
       extensions: ['.md'],
+      layout: {
+        blog: blogLayout
+      },
       rehypePlugins: [rehypeSlug],
       highlight: {
         highlighter: (code, lang) => {
-          let html = highlighter.codeToHtml(code, {
+          const html = highlighter.codeToHtml(code, {
             lang: lang || 'text',
-            theme: 'github-light'
+            themes: { light: 'github-light', dark: 'github-dark' }
           });
-          // Replace white background with slate-50 (#f8fafc)
-          html = html.replace(/background-color:#fff/g, 'background-color:#f8fafc');
           // Escape backticks and ${} to prevent Svelte template interpretation
           const escaped = html.replace(/`/g, '\\`').replace(/\$\{/g, '\\${');
           return `{@html \`${escaped}\`}`;
