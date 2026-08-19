@@ -8,6 +8,41 @@
 
   let email = $state('');
   let status = $state<'idle' | 'loading' | 'success' | 'error'>('idle');
+  let heroLang = $state<'ts' | 'rust'>('ts');
+
+  const stats = [
+    { value: '0.08 ms', label: 'warm SSR render, measured on a real SvelteKit app' },
+    { value: '2.3 ms', label: 'cold start for the same app, with the code cache' },
+    { value: '5 engines', label: 'render it byte-identically against one oracle' },
+    { value: 'MIT', label: 'licensed, end to end - runtime, API and dashboard' }
+  ];
+
+  const features = [
+    {
+      title: 'The Workers model',
+      body: 'Fetch handlers, Request and Response, waitUntil - the API you already know from Cloudflare Workers, running on infrastructure you control.'
+    },
+    {
+      title: 'Bindings built in',
+      body: 'Key-value store, SQL database and object storage, declared per worker. Credentials stay on the host and never enter the sandbox.'
+    },
+    {
+      title: 'WebAssembly workers',
+      body: 'Write workers in Rust with a workers-rs-compatible SDK, in Go with TinyGo, or ship any standard wasi:http component.'
+    },
+    {
+      title: 'Scheduled events',
+      body: 'Cron expressions trigger scheduled handlers with the same runtime, limits and bindings as HTTP workers.'
+    },
+    {
+      title: 'Web-standard runtime',
+      body: 'fetch, streams, WebCrypto, URL, TextEncoder - tracked against a WinterTC-based conformance suite. WebSockets are in beta.'
+    },
+    {
+      title: 'Self-hostable',
+      body: 'A Rust runner plus PostgreSQL is a complete platform. The dashboard, the API and this very website run as workers on it.'
+    }
+  ];
 
   const showcases = [
     {
@@ -51,6 +86,14 @@
     }
   ];
 
+  const oracle = [
+    { engine: 'v8', note: '(oracle)' },
+    { engine: 'jsc', note: 'OK' },
+    { engine: 'quickjs', note: 'OK' },
+    { engine: 'boa', note: 'OK' },
+    { engine: 'nova', note: 'OK' }
+  ];
+
   async function subscribe(e: SubmitEvent) {
     e.preventDefault();
     status = 'loading';
@@ -70,51 +113,88 @@
 </script>
 
 <svelte:head>
-  <title>OpenWorkers - Deploy instantly</title>
+  <title>OpenWorkers - The open-source workers platform</title>
   <meta
     name="description"
-    content="Deploy your serverless functions instantly. Schedule jobs, build powerful flows, and scale with ease."
+    content="Run JavaScript, TypeScript and WebAssembly workers on your own infrastructure. Cloudflare Workers-compatible, built in Rust on V8 isolates, with KV, SQL, storage and cron built in."
   />
+  <meta property="og:title" content="OpenWorkers - The open-source workers platform" />
+  <meta
+    property="og:description"
+    content="Run JavaScript, TypeScript and WebAssembly workers on your own infrastructure. Cloudflare Workers-compatible, built in Rust on V8 isolates."
+  />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://openworkers.dev/" />
 </svelte:head>
 
-<div class="min-h-[calc(100vh-18rem)]">
-  <div class="container mt-24 max-w-7xl flex-col">
-    <div class="flex w-full flex-col justify-between gap-8 px-8 xl:flex-row xl:flex-wrap">
-      <!-- Block 1 -->
-      <div class="order-1 mx-auto max-w-xl xl:order-1 xl:flex-1">
-        <div>
-          <div
-            class="mb-6 inline-flex items-center rounded-full border border-blue-100 bg-blue-50 px-3 py-1 text-sm font-medium text-blue-600"
-          >
-            Now in public beta
-          </div>
+<main>
+  <!-- Hero -->
+  <div class="container mt-16 max-w-7xl flex-col sm:mt-24">
+    <div class="flex w-full flex-col items-center justify-between gap-12 px-4 sm:px-8 xl:flex-row">
+      <div class="max-w-xl xl:flex-1">
+        <div
+          class="mb-6 inline-flex items-center gap-2 rounded-full border border-accent/20 bg-accent-soft px-3 py-1 text-sm font-medium text-accent"
+        >
+          <span class="h-1.5 w-1.5 rounded-full bg-accent"></span>
+          Open source, now in public beta
+        </div>
 
-          <h1 class="title mb-4 text-5xl font-bold text-slate-800">
-            Deploy&nbsp;<span class="text-gradient">instantly</span>
-          </h1>
+        <h1 class="title mb-5 text-4xl font-bold tracking-tight sm:text-5xl">
+          Run workers on <span class="text-gradient">your own</span> infrastructure
+        </h1>
 
-          <div class="my-12 flex">
-            <ul class="list-checkmark mx-auto xl:mx-0">
-              <li>Schedule jobs and build powerful flows</li>
-              <li>Built-in monitoring</li>
-              <li>Scale with ease</li>
-              <li>Open source ecosystem</li>
-              <li>Automate your deployments</li>
-              <li>Easily bind your domains to workers</li>
-            </ul>
-          </div>
+        <p class="mb-8 text-lg leading-8 text-muted">
+          OpenWorkers is an open-source serverless platform built in Rust: JavaScript, TypeScript and WebAssembly in V8
+          isolates, with the Cloudflare Workers programming model - fetch handlers, KV, SQL, storage and cron.
+        </p>
+
+        <div class="flex flex-wrap gap-4">
+          <a href={loginUrl} target="_blank" class="btn btn-blue rounded-md px-6 py-3 text-base">Get started</a>
+          <a href="/docs" class="btn btn-ghost rounded-md px-6 py-3 text-base">Read the docs</a>
+          <a href="/docs/self-hosting" class="btn rounded-md px-3 py-3 text-base text-muted hover:text-fg">
+            Self-host &rarr;
+          </a>
         </div>
       </div>
 
-      <!-- Console -->
-      <div class="order-3 mx-auto max-w-xl xl:order-2 xl:flex-1">
-        <Console title="hello.ts" content={data.codeHtml}>
+      <div class="w-full max-w-xl xl:flex-1">
+        <div class="mb-3 flex gap-1 rounded-lg border bg-surface p-1 text-sm font-medium" role="tablist">
+          <button
+            type="button"
+            role="tab"
+            aria-selected={heroLang === 'ts'}
+            class="flex-1 rounded-md px-3 py-1.5 transition-colors {heroLang === 'ts'
+              ? 'bg-bg text-fg shadow-sm'
+              : 'text-muted hover:text-fg'}"
+            onclick={() => (heroLang = 'ts')}
+          >
+            TypeScript
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={heroLang === 'rust'}
+            class="flex-1 rounded-md px-3 py-1.5 transition-colors {heroLang === 'rust'
+              ? 'bg-bg text-fg shadow-sm'
+              : 'text-muted hover:text-fg'}"
+            onclick={() => (heroLang = 'rust')}
+          >
+            Rust
+          </button>
+        </div>
+
+        <Console
+          title={heroLang === 'ts' ? 'hello.ts' : 'lib.rs'}
+          content={heroLang === 'ts' ? data.codeHtml : data.rustHtml}
+        >
           {#snippet footer()}
             <div class="flex items-center justify-between px-6 py-3">
-              <span class="text-xs text-slate-500">TypeScript supported out of the box</span>
+              <span class="text-xs text-faint">
+                {heroLang === 'ts' ? 'TypeScript supported out of the box' : 'workers-rs-compatible SDK'}
+              </span>
               <a
-                href="/docs/examples/json-api"
-                class="text-xs font-medium text-blue-500 transition-colors hover:text-blue-600"
+                href={heroLang === 'ts' ? '/docs/examples/json-api' : '/docs/workers/event-fetch'}
+                class="text-xs font-medium text-accent transition-colors hover:text-accent-hover"
               >
                 View more examples
               </a>
@@ -122,26 +202,90 @@
           {/snippet}
         </Console>
       </div>
+    </div>
+  </div>
 
-      <!-- Buttons -->
-      <div class="order-2 mx-auto w-full xl:order-3 xl:max-w-none">
-        <div class="flex flex-col gap-4 md:flex-row justify-center">
-          <a href={loginUrl} target="_blank" class="btn btn-blue rounded px-7 py-4 text-xl"> Get Started </a>
-          <a
-            href="/docs"
-            class="btn rounded border border-slate-200 bg-white px-7 py-4 text-xl text-slate-700 hover:bg-slate-50"
-          >
-            Read Documentation
-          </a>
+  <!-- Stats -->
+  <div class="container my-20 max-w-7xl sm:my-28">
+    <div class="grid w-full grid-cols-2 gap-px overflow-hidden rounded-2xl border bg-border lg:grid-cols-4">
+      {#each stats as stat}
+        <div class="flex flex-col gap-2 bg-bg p-6 sm:p-8">
+          <span class="font-mono text-2xl font-semibold tracking-tight sm:text-3xl">{stat.value}</span>
+          <span class="text-sm leading-6 text-muted">{stat.label}</span>
+        </div>
+      {/each}
+    </div>
+  </div>
+
+  <!-- Engine oracle -->
+  <div class="container my-20 max-w-7xl sm:my-28">
+    <div class="flex w-full flex-col items-center gap-10 px-4 sm:px-8 lg:flex-row lg:gap-16">
+      <div class="max-w-xl lg:flex-1">
+        <h2 class="title mb-4 text-3xl font-bold tracking-tight">One worker API. Five engines. Identical bytes.</h2>
+        <p class="mb-4 leading-7 text-muted">
+          Compatibility is measured, not claimed. The conformance suite replays a real SvelteKit server bundle against a
+          recorded oracle: status, headers in emission order, and the exact body bytes.
+        </p>
+        <p class="mb-6 leading-7 text-muted">
+          V8, JavaScriptCore, QuickJS, Boa and Nova all return the same 2615 bytes - same sha256, same header order.
+        </p>
+        <a href="/blog/five-engines-one-sha256" class="font-medium text-accent hover:text-accent-hover">
+          Read how it was done &rarr;
+        </a>
+      </div>
+
+      <div class="w-full max-w-xl lg:flex-1">
+        <div class="overflow-hidden rounded-xl border bg-bg shadow-[0_5px_20px_#0002]">
+          <div class="flex h-10 items-center border-b bg-surface px-4">
+            <div class="flex w-16 items-center space-x-2">
+              <div class="h-3 w-3 rounded-full bg-border-strong"></div>
+              <div class="h-3 w-3 rounded-full bg-border-strong"></div>
+              <div class="h-3 w-3 rounded-full bg-border-strong"></div>
+            </div>
+            <div class="font-mono text-xs text-faint">conformance - sveltekit-app fixture</div>
+          </div>
+          <div class="overflow-x-auto bg-code-bg p-4 font-mono text-xs leading-6 sm:text-sm">
+            {#each oracle as row}
+              <div class="flex gap-4 whitespace-nowrap">
+                <span class="w-16 text-accent">{row.engine}</span>
+                <span class="text-muted">200 OK</span>
+                <span class="text-muted">2615 bytes</span>
+                <span class="text-faint">sha256 2ccbe4f9&hellip;a584c</span>
+                <span class={row.note === 'OK' ? 'text-green-600 dark:text-green-400' : 'text-faint'}>
+                  {row.note}
+                </span>
+              </div>
+            {/each}
+          </div>
         </div>
       </div>
     </div>
   </div>
 
-  <div class="container my-24 max-w-7xl">
-    <div class="px-8">
-      <h2 class="mb-4 text-center text-3xl font-bold text-slate-800">Built with OpenWorkers</h2>
-      <p class="mx-auto mb-12 max-w-2xl text-center text-slate-600">
+  <!-- Features -->
+  <div class="container my-20 max-w-7xl sm:my-28">
+    <div class="w-full px-4 sm:px-8">
+      <h2 class="title mb-4 text-center text-3xl font-bold tracking-tight">Everything a workers platform needs</h2>
+      <p class="mx-auto mb-12 max-w-2xl text-center text-muted">
+        The runtime, the bindings and the scheduling are part of the platform, not an integration exercise.
+      </p>
+
+      <div class="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+        {#each features as feature}
+          <div class="rounded-xl border bg-surface p-6">
+            <h3 class="mb-2 text-base font-semibold">{feature.title}</h3>
+            <p class="text-sm leading-6 text-muted">{feature.body}</p>
+          </div>
+        {/each}
+      </div>
+    </div>
+  </div>
+
+  <!-- Showcase -->
+  <div class="container my-20 max-w-7xl sm:my-28">
+    <div class="w-full px-4 sm:px-8">
+      <h2 class="title mb-4 text-center text-3xl font-bold tracking-tight">Built with OpenWorkers</h2>
+      <p class="mx-auto mb-12 max-w-2xl text-center text-muted">
         Real-world examples running in production. See what you can build with OpenWorkers.
       </p>
 
@@ -159,27 +303,31 @@
     </div>
   </div>
 
-  <div class="container my-24 max-w-7xl">
-    <div class="rounded-2xl border border-slate-200 bg-white px-6 py-12 sm:px-12">
+  <!-- Newsletter -->
+  <div class="container my-20 max-w-7xl sm:my-28">
+    <div class="w-full rounded-2xl border bg-surface px-6 py-12 sm:px-12">
       <div class="flex w-full flex-col items-center justify-between gap-6 md:flex-row">
-        <h4 class="text-xl font-semibold text-slate-800">Sign up for our newsletter</h4>
+        <div>
+          <h4 class="text-xl font-semibold">Follow the engineering</h4>
+          <p class="mt-1 text-sm text-muted">Release notes and engineering posts. No marketing, unsubscribe anytime.</p>
+        </div>
 
         {#if status === 'success'}
-          <p class="text-green-600 font-medium">Subscribed!</p>
+          <p class="font-medium text-green-600 dark:text-green-400">Subscribed!</p>
         {:else}
           <form class="flex flex-wrap items-center justify-end gap-4" onsubmit={subscribe}>
             {#if status === 'error'}
-              <p class="w-full text-right text-red-600">Failed to subscribe. Please try again.</p>
+              <p class="w-full text-right text-red-600 dark:text-red-400">Failed to subscribe. Please try again.</p>
             {/if}
 
-            <div class="relative max-w-[24rem] flex-1 rounded-lg border border-slate-200 lg:max-w-lg">
+            <div class="relative max-w-[24rem] flex-1 rounded-lg border bg-bg lg:max-w-lg">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke-width="1.5"
                 stroke="currentColor"
-                class="absolute top-1/2 mx-3 h-5 w-5 translate-y-[-50%] text-slate-400"
+                class="absolute top-1/2 mx-3 h-5 w-5 translate-y-[-50%] text-faint"
               >
                 <path
                   stroke-linecap="round"
@@ -188,7 +336,7 @@
               </svg>
 
               <input
-                class="h-12 w-full rounded-lg pr-4 pl-10 lg:min-w-[20rem]"
+                class="h-12 w-full rounded-lg bg-transparent pr-4 pl-10 lg:min-w-[20rem]"
                 type="email"
                 bind:value={email}
                 autocomplete="email"
@@ -197,7 +345,7 @@
               />
             </div>
 
-            <button type="submit" class="btn btn-blue h-12 rounded-lg px-6 text-lg" disabled={status === 'loading'}>
+            <button type="submit" class="btn btn-blue h-12 rounded-lg px-6" disabled={status === 'loading'}>
               {status === 'loading' ? 'Subscribing...' : 'Subscribe'}
             </button>
           </form>
@@ -205,35 +353,4 @@
       </div>
     </div>
   </div>
-</div>
-
-<footer class="border-t border-slate-200">
-  <div class="container max-w-7xl flex-col items-center py-12 md:flex-row md:justify-between">
-    <div class="mb-4 flex items-baseline gap-4 md:mb-0">
-      <span class="text-xl font-bold bg-clip-text text-transparent bg-linear-to-r from-slate-800 to-slate-600">
-        OpenWorkers
-      </span>
-      <span class="text-sm text-slate-500">© {new Date().getFullYear()} OpenWorkers</span>
-    </div>
-
-    <div class="flex items-center gap-6">
-      <a href="/terms-of-service" class="text-sm text-slate-500 hover:text-slate-700">Terms</a>
-      <a href="/privacy-policy" class="text-sm text-slate-500 hover:text-slate-700">Privacy</a>
-
-      <span class="text-slate-300">|</span>
-
-      <a href="https://github.com/openworkers" target="_blank" class="group">
-        <span class="sr-only">GitHub</span>
-        <img src="/github.svg" alt="github" class="h-6 w-6 opacity-60 transition-opacity group-hover:opacity-100" />
-      </a>
-      <a href="https://t.me/openworkers" target="_blank" class="group">
-        <span class="sr-only">Telegram</span>
-        <img src="/telegram.svg" alt="telegram" class="h-6 w-6 opacity-60 transition-opacity group-hover:opacity-100" />
-      </a>
-      <a href="https://twitter.com/openworkers" target="_blank" class="group">
-        <span class="sr-only">Twitter</span>
-        <img src="/twitter.svg" alt="twitter" class="h-6 w-6 opacity-60 transition-opacity group-hover:opacity-100" />
-      </a>
-    </div>
-  </div>
-</footer>
+</main>
