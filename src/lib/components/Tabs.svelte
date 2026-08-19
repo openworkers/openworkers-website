@@ -31,23 +31,23 @@
   }
 </script>
 
-<div class="my-6 overflow-hidden rounded-lg border border-slate-200">
-  <div class="flex border-b border-slate-200 bg-slate-50">
+<div class="my-6 overflow-hidden rounded-lg border">
+  <div class="flex border-b bg-surface">
     {#each tabs as tab, i}
       <button
         type="button"
         onclick={() => selectTab(i)}
         class="px-4 py-2.5 text-sm font-medium transition-colors
           {active === i
-          ? 'bg-white text-blue-600 border-b-2 border-blue-500 -mb-px'
-          : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'}"
+          ? 'bg-bg text-accent border-b-2 border-accent -mb-px'
+          : 'text-muted hover:text-fg hover:bg-surface-2'}"
       >
         {tab}
       </button>
     {/each}
   </div>
 
-  <div class="bg-white p-4 [&>div>h2]:mt-0 [&>div>h2:first-child]:mt-0 [&>div>p:first-child]:mt-0 [&_pre]:my-4">
+  <div class="bg-bg p-4 [&>div>h2]:mt-0 [&>div>h2:first-child]:mt-0 [&>div>p:first-child]:mt-0 [&_pre]:my-4">
     {@render children(active)}
   </div>
 </div>
