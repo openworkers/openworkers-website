@@ -1,15 +1,64 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@800&family=Roboto:wght@100;300;400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
 @import 'tailwindcss';
 
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Raw token values; @theme inline maps them to utilities (bg-bg, text-fg, ...) */
+:root {
+  color-scheme: light;
+
+  --bg: #ffffff;
+  --surface: #f8fafc;
+  --surface-2: #f1f5f9;
+  --fg: #0f172a;
+  --muted: #475569;
+  --faint: #8494ab;
+  --border: #e2e8f0;
+  --border-strong: #cbd5e1;
+  --accent: #057feb;
+  --accent-hover: #0369c8;
+  --accent-soft: #eff6ff;
+  --code-bg: #f7f9fc;
+  --scrollbar: #d4dae3;
+}
+
+.dark {
+  color-scheme: dark;
+
+  --bg: #0a0e14;
+  --surface: #0f141c;
+  --surface-2: #151c26;
+  --fg: #e6eaf0;
+  --muted: #9aa8bc;
+  --faint: #64748b;
+  --border: #1d2634;
+  --border-strong: #2c3a4f;
+  --accent: #4ca9ff;
+  --accent-hover: #7cc0ff;
+  --accent-soft: #102640;
+  --code-bg: #0d1117;
+  --scrollbar: #2c3a4f;
+}
+
 @theme {
-  --color-primary: #1f2937;
-  --color-bg-primary: #ffffff;
-  --color-black: #101010;
+  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
   --breakpoint-xs: 375px;
 }
 
-:root {
-  --border-color: #e5e7eb;
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-fg: var(--fg);
+  --color-muted: var(--muted);
+  --color-faint: var(--faint);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-soft: var(--accent-soft);
+  --color-code-bg: var(--code-bg);
 }
 
 ::-webkit-scrollbar {
@@ -28,14 +77,8 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: rgba(217, 217, 227, 0.8);
-  border-color: rgba(255, 255, 255, 1);
+  background-color: var(--scrollbar);
   border-radius: 9999px;
-  border-width: 1px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(236, 236, 241, 1);
 }
 
 @layer base {
@@ -44,7 +87,22 @@
   ::before,
   ::backdrop,
   ::file-selector-button {
-    border-color: var(--border-color);
+    border-color: var(--border);
+  }
+
+  html {
+    overflow-y: scroll;
+    font-family: var(--font-sans);
+  }
+
+  body {
+    color: var(--fg);
+    background-color: var(--bg);
+  }
+
+  ::selection {
+    background-color: var(--accent);
+    color: #ffffff;
   }
 
   h1 {
@@ -65,10 +123,6 @@
 
   h5 {
     @apply text-lg;
-  }
-
-  html {
-    overflow-y: scroll;
   }
 
   input,
@@ -92,26 +146,7 @@
   }
 
   select option:disabled {
-    @apply text-gray-400;
-  }
-
-  body {
-    color: var(--color-primary);
-    background-color: var(--color-bg-primary);
-  }
-}
-
-@layer components {
-  .glass-panel {
-    @apply bg-white/70 backdrop-blur-lg border border-white/20 shadow-xl;
-  }
-
-  .text-gradient-primary {
-    @apply bg-gradient-to-r from-slate-900 to-slate-600 bg-clip-text text-transparent;
-  }
-
-  .text-gradient-blue {
-    @apply bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent;
+    color: var(--faint);
   }
 }
 
@@ -126,23 +161,23 @@
   }
 
   nav .link {
-    @apply text-slate-700 hover:text-blue-500;
+    @apply text-sm font-medium text-muted transition-colors hover:text-fg;
   }
 
   nav .link.active {
-    @apply text-blue-500;
+    @apply text-fg;
   }
 
   aside.menu li > a {
-    @apply block rounded p-2 hover:bg-gray-100 hover:text-slate-800;
+    @apply block rounded-md px-2 py-1.5 text-muted transition-colors hover:bg-surface-2 hover:text-fg;
   }
 
   aside.menu li > a.active {
-    @apply bg-blue-50 font-semibold text-blue-500;
+    @apply bg-accent-soft font-medium text-accent;
   }
 
-  .markdown {
-    overflow: hidden;
+  .markdown-body {
+    @apply leading-7 text-fg;
   }
 
   .markdown-body h1,
@@ -151,20 +186,20 @@
   .markdown-body h4,
   .markdown-body h5,
   .markdown-body h6 {
-    @apply pb-1;
+    @apply pb-1 font-semibold tracking-tight;
     scroll-margin-top: 6rem;
   }
 
   .markdown-body h1 {
-    @apply text-2xl border-b font-semibold;
+    @apply mb-4 border-b text-3xl;
   }
 
   .markdown-body h2 {
-    @apply text-xl border-b font-semibold;
+    @apply mt-10 border-b text-xl;
   }
 
   .markdown-body h3 {
-    @apply text-base font-semibold;
+    @apply mt-8 text-base;
   }
 
   .markdown-body > *,
@@ -172,6 +207,26 @@
   .markdown-body h1,
   .markdown-body h2 {
     @apply mb-4;
+  }
+
+  .markdown-body ul:not(.contains-task-list) {
+    @apply mb-4 list-disc ps-6;
+  }
+
+  .markdown-body ol {
+    @apply mb-4 list-decimal ps-6;
+  }
+
+  .markdown-body li {
+    @apply my-1;
+  }
+
+  .markdown-body blockquote {
+    @apply mb-4 border-l-4 border-border-strong ps-4 text-muted;
+  }
+
+  .markdown-body hr {
+    @apply my-8;
   }
 
   .markdown-body .task-list-item input[type='checkbox'] {
@@ -192,7 +247,8 @@
   }
 
   .markdown-body pre {
-    @apply overflow-x-auto rounded-lg p-4 text-sm leading-6;
+    @apply mb-4 overflow-x-auto rounded-lg border p-4 text-sm leading-6;
+    font-family: var(--font-mono);
   }
 
   .markdown-body pre.shiki code {
@@ -200,11 +256,12 @@
   }
 
   .markdown-body :not(pre) > code {
-    @apply rounded bg-slate-100 px-1.5 py-0.5;
+    @apply rounded-md bg-surface-2 px-1.5 py-0.5 text-[0.875em];
+    font-family: var(--font-mono);
   }
 
   .markdown-body a {
-    @apply text-blue-500 hover:underline;
+    @apply text-accent hover:underline;
   }
 
   .markdown-body table {
@@ -213,15 +270,28 @@
 
   .markdown-body th,
   .markdown-body td {
-    @apply border border-gray-200 px-3 py-2 text-left;
+    @apply border px-3 py-2 text-left;
   }
 
   .markdown-body th {
-    @apply bg-gray-50 font-semibold;
+    @apply bg-surface font-semibold;
   }
 
   .markdown-body tr:hover {
-    @apply bg-gray-50/50;
+    @apply bg-surface;
+  }
+
+  /* Shiki inlines light colors; dark ones ride as --shiki-dark vars */
+  pre.shiki {
+    background-color: var(--code-bg) !important;
+  }
+
+  .dark .shiki,
+  .dark .shiki span {
+    color: var(--shiki-dark) !important;
+    font-style: var(--shiki-dark-font-style) !important;
+    font-weight: var(--shiki-dark-font-weight) !important;
+    text-decoration: var(--shiki-dark-text-decoration) !important;
   }
 
   .container {
@@ -229,25 +299,15 @@
   }
 
   .btn {
-    @apply inline-flex items-center justify-center rounded-md transition-colors duration-150 ease-in-out;
+    @apply inline-flex items-center justify-center rounded-md font-medium transition-colors duration-150 ease-in-out;
   }
 
   .btn-blue {
-    @apply text-white;
-    background-color: #057feb;
+    @apply bg-accent text-white hover:bg-accent-hover;
   }
 
-  ul.list-checkmark li {
-    @apply flex items-center p-1;
-  }
-
-  ul.list-checkmark li::before {
-    @apply mr-2 flex h-6 w-6 items-center justify-center rounded-full bg-green-600/10 text-green-600;
-    content: ' ';
-    background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2MCA2MCI+PHBhdGggc3Ryb2tlPSIjMTZhMzRhIiBzdHJva2Utd2lkdGg9IjEwIiBmaWxsPSJub25lIiBkPSJNOCAzMCBMMjMgNDUgNTMgMTUiLz48L3N2Zz4=');
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: 50%;
+  .btn-ghost {
+    @apply border border-border bg-bg text-fg hover:bg-surface;
   }
 
   .antialiased {
@@ -256,10 +316,14 @@
   }
 
   .title {
-    font-family: Inter, sans-serif;
+    font-family: var(--font-sans);
   }
 
   .text-gradient {
     @apply bg-gradient-to-r from-cyan-500 to-[#057feb] bg-clip-text text-transparent;
+  }
+
+  .dark .text-gradient {
+    @apply from-cyan-400 to-[#4ca9ff];
   }
 }

@@ -17,38 +17,39 @@
   );
 </script>
 
-<div
-  class="max-h-none my-12 min-w-md overflow-hidden rounded-xl border border-slate-100 bg-white shadow-[0_5px_20px_#0001] sm:mx-10"
->
-  <div class="flex h-10 border-b border-slate-100">
-    <div class="flex w-[33%] items-center space-x-2 px-4">
-      <div class="h-3 w-3 rounded-full bg-slate-200"></div>
-      <div class="h-3 w-3 rounded-full bg-slate-200"></div>
-      <div class="h-3 w-3 rounded-full bg-slate-200"></div>
+<div class="w-full overflow-hidden rounded-xl border bg-bg shadow-[0_5px_20px_#0002]">
+  <div class="flex h-10 items-center border-b bg-surface px-4">
+    <div class="flex w-16 items-center space-x-2">
+      <div class="h-3 w-3 rounded-full bg-border-strong"></div>
+      <div class="h-3 w-3 rounded-full bg-border-strong"></div>
+      <div class="h-3 w-3 rounded-full bg-border-strong"></div>
     </div>
-    <div class="flex items-center text-sm text-slate-400">
+    <div class="font-mono text-xs text-faint">
       {title}
     </div>
   </div>
 
-  <div class="flex flex-auto flex-col overflow-x-auto">
-    <div class="flex flex-auto">
-      <div class="flex flex-row">
-        <pre class="select-none whitespace-nowrap text-right text-sm text-slate-400" aria-hidden="true">
-					<code class="block p-4">
-						{#each lines as line}
-              {line}<br />
-            {/each}
-					</code>
-				</pre>
-        <pre class="mt-4 mr-4 text-sm">{@html content}</pre>
-      </div>
-    </div>
+  <div class="console-body flex overflow-x-auto bg-code-bg py-4 font-mono text-sm leading-6">
+    <pre class="select-none px-4 text-right text-faint" aria-hidden="true"><code
+        >{#each lines as line}{line}
+        {/each}</code
+      ></pre>
+    <div class="pr-4">{@html content}</div>
   </div>
 
   {#if footer}
-    <div class="border-t border-slate-100 text-slate-400">
+    <div class="border-t text-faint">
       {@render footer()}
     </div>
   {/if}
 </div>
+
+<style>
+  .console-body :global(pre.shiki) {
+    background-color: transparent !important;
+    padding: 0;
+    margin: 0;
+    border: 0;
+    border-radius: 0;
+  }
+</style>

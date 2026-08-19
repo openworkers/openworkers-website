@@ -4,6 +4,9 @@
   import { dev } from '$app/environment';
   import { afterNavigate } from '$app/navigation';
   import { browser } from '$app/environment';
+  import Logo from '$lib/components/Logo.svelte';
+  import Footer from '$lib/components/Footer.svelte';
+  import ThemeToggle from '$lib/components/ThemeToggle.svelte';
 
   let { children } = $props();
 
@@ -25,25 +28,40 @@
   }
 </script>
 
-<nav class="w-full bg-white px-4" class:fixed={isDocsPage} class:border-b={isDocsPage} class:shadow-sm={isDocsPage}>
+<nav class="sticky top-0 z-40 w-full border-b bg-bg/80 px-4 backdrop-blur-lg">
   <div class="container h-16 max-w-7xl items-center justify-between">
     <div class="flex flex-1 gap-2">
-      <a href="/">
-        <img class="hidden h-8 xs:block" src="/icon-black-long.svg" alt="logo" />
-        <img class="block h-8 xs:hidden" src="/icon-black.svg" alt="logo" />
+      <a href="/" class="text-fg" aria-label="OpenWorkers home">
+        <Logo variant="full" class="hidden h-7 sm:block" />
+        <Logo variant="mark" class="block h-7 sm:hidden" />
       </a>
     </div>
 
-    <div class="flex items-center gap-8 font-semibold">
-      <a href="https://github.com/openworkers" target="_blank" class="group">
-        <span class="sr-only">GitHub</span>
-        <img src="/github.svg" alt="GitHub" class="h-5 w-5 opacity-60 transition-opacity group-hover:opacity-100" />
-      </a>
+    <div class="flex items-center gap-5 sm:gap-7">
       <a class="link" class:active={isDocsPage} href="/docs">Docs</a>
       <a class="link" class:active={isBlogPage} href="/blog">Blog</a>
-      <a class="link" href={loginUrl} target="_blank">Sign in</a>
+      <a
+        href="https://github.com/openworkers"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="text-muted transition-colors hover:text-fg"
+      >
+        <span class="sr-only">GitHub</span>
+        <svg class="h-5 w-5" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+          <path
+            fill-rule="evenodd"
+            d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"
+          />
+        </svg>
+      </a>
+      <ThemeToggle />
+      <a class="btn btn-blue hidden rounded-md px-3.5 py-1.5 text-sm sm:inline-flex" href={loginUrl} target="_blank">
+        Sign in
+      </a>
     </div>
   </div>
 </nav>
 
 {@render children()}
+
+<Footer />
