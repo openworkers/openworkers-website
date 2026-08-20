@@ -95,6 +95,14 @@
     font-family: var(--font-sans);
   }
 
+  /* Code samples must show what you would type: => and -> stay two glyphs. */
+  pre,
+  code,
+  kbd,
+  samp {
+    font-variant-ligatures: none;
+  }
+
   body {
     color: var(--fg);
     background-color: var(--bg);
