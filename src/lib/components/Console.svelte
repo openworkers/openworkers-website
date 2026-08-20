@@ -30,7 +30,7 @@
   </div>
 
   <div class="console-body flex overflow-x-auto bg-code-bg py-4 font-mono text-sm leading-6">
-    <pre class="select-none px-4 text-right text-faint" aria-hidden="true"><code
+    <pre class="select-none pl-3 pr-3 text-right text-faint" aria-hidden="true"><code
         >{#each lines as line}{line}
         {/each}</code
       ></pre>

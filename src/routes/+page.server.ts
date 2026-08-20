@@ -13,9 +13,10 @@ async function handleRequest(request: Request) {
 const rustCode = `use worker::*;
 
 #[event(fetch)]
-async fn fetch(req: Request, env: Env, _ctx: Context) -> Result<Response> {
+async fn fetch(
+    req: Request, env: Env, _ctx: Context,
+) -> Result<Response> {
     let name = env.var("NAME")?.to_string();
-
     Response::ok(format!("Hello {name}"))
 }`;
 
