@@ -9,11 +9,12 @@
 
   let { title, content, footer }: Props = $props();
 
-  const lines = $derived(
+  const gutter = $derived(
     content
       .trim()
       .split('\n')
       .map((_, i) => i + 1)
+      .join('\n')
   );
 </script>
 
@@ -31,8 +32,7 @@
 
   <div class="console-body flex overflow-x-auto bg-code-bg py-4 font-mono text-sm leading-6">
     <pre class="select-none pl-3 pr-3 text-right text-faint" aria-hidden="true"><code
-        >{#each lines as line}{line}
-        {/each}</code
+        >{gutter}</code
       ></pre>
     <div class="pr-4">{@html content}</div>
   </div>
