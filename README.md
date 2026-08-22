@@ -16,7 +16,7 @@ output lands in `build/`.
 
 ## Deployment
 
-The website is [automatically deployed to GitHub Pages](https://github.com/marketplace/actions/deploy-to-github-pages) when changes are pushed to the master branch.
+The website is [automatically deployed to GitHub Pages](https://github.com/marketplace/actions/deploy-to-github-pages) when changes are pushed to the main branch.
 
 ## Contributing
 
