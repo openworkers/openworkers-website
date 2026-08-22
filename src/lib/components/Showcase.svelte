@@ -28,7 +28,8 @@
   </div>
 
   <div class="relative aspect-video w-full overflow-hidden bg-surface">
-    <img src={screenshot} alt={title} loading="lazy" class="h-full w-full object-cover object-top" />
+    <!-- bg-white shows only through transparent screenshots (the QR SVG), keeping it scannable in dark theme -->
+    <img src={screenshot} alt={title} loading="lazy" class="h-full w-full bg-white object-cover object-top" />
   </div>
 
   <div class="flex-1 border-t p-4">

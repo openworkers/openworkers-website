@@ -11,9 +11,9 @@
   let heroLang = $state<'ts' | 'rust'>('ts');
 
   const stats = [
-    { value: '0.08 ms', label: 'warm SSR render, measured on a real SvelteKit app' },
-    { value: '2.3 ms', label: 'cold start for the same app, with the code cache' },
-    { value: '5 engines', label: 'render it byte-identically against one oracle' },
+    { value: '0.08 ms', label: 'warm request, server-side render included' },
+    { value: '2.3 ms', label: 'cold start, from cached code to first response' },
+    { value: 'Rust + Postgres', label: 'the whole self-hosted stack: one runner, one database' },
     { value: 'MIT', label: 'licensed, end to end - runtime, API and dashboard' }
   ];
 
@@ -86,14 +86,6 @@
     }
   ];
 
-  const oracle = [
-    { engine: 'v8', note: '(oracle)' },
-    { engine: 'jsc', note: 'OK' },
-    { engine: 'quickjs', note: 'OK' },
-    { engine: 'boa', note: 'OK' },
-    { engine: 'nova', note: 'OK' }
-  ];
-
   async function subscribe(e: SubmitEvent) {
     e.preventDefault();
     status = 'loading';
@@ -116,15 +108,15 @@
   <title>OpenWorkers - The open-source workers platform</title>
   <meta
     name="description"
-    content="Run JavaScript, TypeScript and WebAssembly workers on your own infrastructure. Cloudflare Workers-compatible, built in Rust on V8 isolates, with KV, SQL, storage and cron built in."
+    content="Run JavaScript, TypeScript and WebAssembly workers on your own infrastructure. Cloudflare Workers-compatible, built in Rust, with KV, SQL, storage and cron built in."
   />
   <meta property="og:title" content="OpenWorkers - The open-source workers platform" />
   <meta
     property="og:description"
-    content="Run JavaScript, TypeScript and WebAssembly workers on your own infrastructure. Cloudflare Workers-compatible, built in Rust on V8 isolates."
+    content="Run JavaScript, TypeScript and WebAssembly workers on your own infrastructure. Cloudflare Workers-compatible, built in Rust."
   />
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://openworkers.dev/" />
+  <meta property="og:url" content="https://openworkers.com/" />
 </svelte:head>
 
 <main>
@@ -144,8 +136,9 @@
         </h1>
 
         <p class="mb-8 text-lg leading-8 text-muted">
-          OpenWorkers is an open-source serverless platform built in Rust: JavaScript, TypeScript and WebAssembly in V8
-          isolates, with the Cloudflare Workers programming model - fetch handlers, KV, SQL, storage and cron.
+          OpenWorkers is an open-source serverless platform built in Rust: JavaScript and TypeScript in V8 isolates,
+          Rust as native WebAssembly components, with the Cloudflare Workers programming model - fetch handlers, KV,
+          SQL, storage and cron.
         </p>
 
         <div class="flex flex-wrap gap-4">
@@ -214,51 +207,6 @@
           <span class="text-sm leading-6 text-muted">{stat.label}</span>
         </div>
       {/each}
-    </div>
-  </div>
-
-  <!-- Engine oracle -->
-  <div class="container my-20 max-w-7xl sm:my-28">
-    <div class="flex w-full flex-col items-center gap-10 px-4 sm:px-8 lg:flex-row lg:gap-16">
-      <div class="max-w-xl lg:flex-1">
-        <h2 class="title mb-4 text-3xl font-bold tracking-tight">One worker API. Five engines. Identical bytes.</h2>
-        <p class="mb-4 leading-7 text-muted">
-          Compatibility is measured, not claimed. The conformance suite replays a real SvelteKit server bundle against a
-          recorded oracle: status, headers in emission order, and the exact body bytes.
-        </p>
-        <p class="mb-6 leading-7 text-muted">
-          V8, JavaScriptCore, QuickJS, Boa and Nova all return the same 2615 bytes - same sha256, same header order.
-        </p>
-        <a href="/blog/five-engines-one-sha256" class="font-medium text-accent hover:text-accent-hover">
-          Read how it was done &rarr;
-        </a>
-      </div>
-
-      <div class="w-full max-w-xl lg:flex-1">
-        <div class="overflow-hidden rounded-xl border bg-bg shadow-[0_5px_20px_#0002]">
-          <div class="flex h-10 items-center border-b bg-surface px-4">
-            <div class="flex w-16 items-center space-x-2">
-              <div class="h-3 w-3 rounded-full bg-border-strong"></div>
-              <div class="h-3 w-3 rounded-full bg-border-strong"></div>
-              <div class="h-3 w-3 rounded-full bg-border-strong"></div>
-            </div>
-            <div class="font-mono text-xs text-faint">conformance - sveltekit-app fixture</div>
-          </div>
-          <div class="overflow-x-auto bg-code-bg p-4 font-mono text-xs leading-6 sm:text-sm">
-            {#each oracle as row}
-              <div class="flex gap-4 whitespace-nowrap">
-                <span class="w-16 text-accent">{row.engine}</span>
-                <span class="text-muted">200 OK</span>
-                <span class="text-muted">2615 bytes</span>
-                <span class="text-faint">sha256 2ccbe4f9&hellip;a584c</span>
-                <span class={row.note === 'OK' ? 'text-green-600 dark:text-green-400' : 'text-faint'}>
-                  {row.note}
-                </span>
-              </div>
-            {/each}
-          </div>
-        </div>
-      </div>
     </div>
   </div>
 
