@@ -65,14 +65,17 @@ await env.DB.query(
   ['john', 'published']
 );
 
-// Type casting (when needed)
+// Array parameter
+await env.DB.query('SELECT * FROM posts WHERE id = ANY($1)', [[1, 2, 3]]);
+
+// Explicit cast when the column type is ambiguous
 await env.DB.query(
   'INSERT INTO scores (value) VALUES ($1::int)',
-  [scoreString]
+  [score]
 );
 ```
 
-> **Note:** All parameters are passed as strings. PostgreSQL handles type conversion automatically in most cases. Use explicit casts (`::int`, `::boolean`, etc.) when needed.
+> **Note:** Parameters keep their JavaScript type: `null`, booleans, numbers and strings map to the matching SQL types, and an array maps to a SQL array. Binary values are passed as `{ $bytes: '<base64>' }`.
 
 ---
 
@@ -145,6 +148,13 @@ Add a database binding in the dashboard:
 3. Select **Database**
 4. Choose your database and set the binding name (e.g., `DB`)
 
+With the CLI:
+
+```bash
+ow env bind my-env DB my-database --type database
+ow workers link my-worker my-env
+```
+
 ---
 
 ## Limits
@@ -158,7 +168,7 @@ Add a database binding in the dashboard:
 
 ## Differences from Cloudflare D1
 
-OpenWorkers uses a simpler API than Cloudflare D1:
+OpenWorkers exposes a single `query()` method instead of D1's prepared-statement chain:
 
 | D1 | OpenWorkers |
 |----|-------------|

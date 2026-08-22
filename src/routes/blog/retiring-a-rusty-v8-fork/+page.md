@@ -28,7 +28,7 @@ whose address rides in a private property on the context's global. Ownership
 became explicit: the state dies with the context instead of waiting for GC.
 
 **A use-after-free the old version was hiding.** We cached a raw isolate
-pointer across lock acquisitions. In v8 146 that pointer happened to stay
+pointer across lock acquisitions. In V8 146 that pointer happened to stay
 valid; in 152, `Locker::deref_mut` hands out a reference into a cell that
 lives inside the guard, and our cached pointer read a dead stack frame on the
 warm path. The bug existed all along - the upgrade just removed the luck.
@@ -43,7 +43,7 @@ diff is the deleted one.
 
 The payoff, measured on our SSR benchmark: worker creation 3.24 to 2.97 ms,
 cold cycle with code cache 2.16 to 1.99 ms, steady-state rendering unchanged.
-Six engine majors show up at compile and startup, not in JS execution. And
+Six engine majors show up at compile time and startup, not in JS execution. And
 the render stayed byte-identical to the recorded oracle at every step, which
 is what let us do this migration in a day instead of a month.
 
@@ -61,7 +61,7 @@ Being first through an unbuilt path finds things. The sandbox configuration
 had never been exercised by upstream CI, and it turned out to reference two
 source dependencies (`disarm`, `fadec`) that V8's dependency manifest pins
 but rusty_v8's `.gitmodules` never listed - invisible until someone actually
-builds sandbox. That is now fixed and worth an upstream report.
+builds the sandbox configuration. That is now fixed and worth an upstream report.
 
 One recurring cost remains: V8 152 embeds ICU 78, and the `icudtl.dat` you
 ship must match the `set_common_data_NN` symbol of the ICU your engine links.

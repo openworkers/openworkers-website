@@ -206,7 +206,7 @@ async function sendAlert(env, message) {
   await fetch(env.SLACK_WEBHOOK, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ text: `🚨 ${message}` })
+    body: JSON.stringify({ text: `Alert: ${message}` })
   });
 }
 ```

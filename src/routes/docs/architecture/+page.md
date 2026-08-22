@@ -1,13 +1,13 @@
 # Architecture
 
-OpenWorkers is built for security, performance, and extensibility. This section documents the internal architecture for contributors and auditors.
+OpenWorkers runs JavaScript and TypeScript workers in V8 isolates. This section documents the internal architecture for contributors and auditors.
 
 ## Components
 
 ```
 ┌──────────────────────────────────────────────────────────────────┐
 │                         Dashboard                                │
-│                    (Angular + Tailwind)                          │
+│                  (served by the API worker)                      │
 └───────────────────────────┬──────────────────────────────────────┘
                             │                              │
                          REST                             SSE
@@ -15,7 +15,7 @@ OpenWorkers is built for security, performance, and extensibility. This section 
                             ▼                              ▼
 ┌──────────────────────────────────────────┐      ┌─────────────────┐
 │                   API                    │      │      Logs       │
-│            (TypeScript / Bun)            │      │     (Rust)      │
+│      (TypeScript, runs as a worker)      │      │     (Rust)      │
 │   User-facing REST API, CRUD operations  │      │                 │
 └──────────────────────────────────────────┘      │ - NATS → DB     │
                             │                     │ - SSE streaming │
@@ -77,7 +77,7 @@ PostgreSQL is the single source of truth. All components read from/write to the 
 
 ### 4. CLI is the Only Infra Tool
 
-The API is designed to run as a worker (dogfooding). If the platform is down, the API is down. All infrastructure operations go through the CLI with direct DB access.
+The API runs as a worker on the platform (dogfooding). If the platform is down, the API is down. All infrastructure operations go through the CLI with direct DB access.
 
 ### 5. Logs via NATS
 
@@ -125,26 +125,24 @@ This architecture means:
 
 ---
 
-## Future Work
+## Dogfooding
 
-### Dogfooding
+The **API** runs as a worker on OpenWorkers, and serves the **dashboard** UI:
 
-Both **API** and **Dashboard** will run as OpenWorkers workers:
-
-- Proves the platform can host production apps
-- Same deployment model as users
-- CLI remains the only infra tool (for recovery when platform is down)
+- Same deployment model as user workers
+- The CLI stays the only infra tool, for recovery when the platform is down
 
 ---
 
 ## Deep Dives
 
-| Topic                                       | Description                              |
-| ------------------------------------------- | ---------------------------------------- |
-| [Bindings](/docs/architecture/bindings)     | How bindings work internally             |
-| [HTTP Flow](/docs/architecture/http-flow)   | Request/response flow, streaming support |
-| [Event Loop](/docs/architecture/event-loop) | V8 ↔ Rust async communication            |
-| [Security](/docs/architecture/security)     | Isolation, limits, threat model          |
+| Topic                                                         | Description                              |
+| ------------------------------------------------------------- | ---------------------------------------- |
+| [Bindings](/docs/architecture/bindings)                       | How bindings work internally             |
+| [HTTP Flow](/docs/architecture/http-flow)                     | Request/response flow, streaming support |
+| [Event Loop](/docs/architecture/event-loop)                   | V8 ↔ Rust async communication            |
+| [Stream Cancellation](/docs/architecture/stream-cancellation) | Client disconnect during streaming       |
+| [Security](/docs/architecture/security)                       | Isolation, limits, threat model          |
 
 ---
 
@@ -157,10 +155,9 @@ OpenWorkers is open source. Contributions welcome!
 | [openworkers-runner](https://github.com/openworkers/openworkers-runner)         | Core runtime, executes workers              |
 | [openworkers-runtime-v8](https://github.com/openworkers/openworkers-runtime-v8) | V8 isolate integration                      |
 | [openworkers-core](https://github.com/openworkers/openworkers-core)             | Shared types and operations                 |
-| [openworkers-api](https://github.com/openworkers/openworkers-api)               | REST API (TypeScript)                       |
+| [openworkers-api](https://github.com/openworkers/openworkers-api)               | REST API and dashboard (TypeScript)         |
 | [openworkers-scheduler](https://github.com/openworkers/openworkers-scheduler)   | Cron job execution                          |
 | [openworkers-logs](https://github.com/openworkers/openworkers-logs)             | Log ingestion (NATS → DB) and SSE streaming |
 | [openworkers-cli](https://github.com/openworkers/openworkers-cli)               | Admin/infra tool                            |
-| [openworkers-dash](https://github.com/openworkers/openworkers-dash)             | Dashboard (Angular)                         |
 | [postgate](https://github.com/openworkers/postgate)                             | PostgreSQL proxy for DB bindings            |
 | [openworkers-infra](https://github.com/openworkers/openworkers-infra)           | Docker Compose setup for self-hosting       |

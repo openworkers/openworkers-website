@@ -4,12 +4,12 @@ This document details how HTTP requests flow through OpenWorkers, from incoming 
 
 ## Quick Summary
 
-| Direction            | Body Handling | Why                                              |
-| -------------------- | ------------- | ------------------------------------------------ |
-| **Incoming request** | Buffered      | Actix buffers before handler; 99% are small JSON |
-| **Outgoing fetch**   | Buffered      | Request body must be complete before sending     |
-| **Fetch response**   | Streaming     | Uses `reqwest::bytes_stream()`                   |
-| **Worker response**  | Streaming     | Via bounded MPSC channels                        |
+| Direction            | Body Handling | Why                                               |
+| -------------------- | ------------- | ------------------------------------------------- |
+| **Incoming request** | Buffered      | Streamed only when the client opts in (see below) |
+| **Outgoing fetch**   | Buffered      | Request body must be complete before sending      |
+| **Fetch response**   | Streaming     | Uses `reqwest::bytes_stream()`                    |
+| **Worker response**  | Streaming     | Via bounded MPSC channels                         |
 
 ## Request Types
 
@@ -25,18 +25,18 @@ pub struct HttpRequest {
 
 pub enum RequestBody {
     None,
-    Bytes(Bytes),  // Always buffered
+    Bytes(Bytes),                                    // Buffered
+    Stream(mpsc::Receiver<Result<Bytes, String>>),   // Streaming
 }
 ```
 
-**Design decision:** Input bodies are always fully buffered. No streaming input.
+**Design decision:** Input bodies are buffered by default. The runner streams the body only when the request carries the `x-request-body-stream` header, and the streamed path enforces its own size and idle-chunk limits.
 
 **Rationale:**
 
-- 99% of requests are small JSON payloads
-- HTTP servers buffer bodies before passing to handlers
-- Streaming input adds significant complexity
-- Trade-off: simplicity over large upload support
+- Most requests are small JSON payloads
+- Buffering keeps the common path simple and bounded
+- Streaming input stays opt-in, so a slow client cannot pin a worker by accident
 
 ### HttpResponse (openworkers-core)
 
@@ -67,15 +67,15 @@ pub enum ResponseBody {
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│                     Actix-web (HTTP Server)                      │
+│                       Hyper (HTTP Server)                        │
 │                                                                  │
 │   • Buffers entire request body as Bytes                         │
-│   • No streaming support at this layer                           │
+│   • Streams it instead when the client opts in                   │
 └─────────────────────────────────────────────────────────────────┘
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│                    HttpRequest::from_actix()                     │
+│                 HttpRequest::from_hyper_parts()                  │
 │                                                                  │
 │   HttpRequest {                                                  │
 │       method: GET/POST/...,                                      │
@@ -101,7 +101,7 @@ pub enum ResponseBody {
 │                                                                  │
 │   1. Create JS Request object from HttpRequest                   │
 │   2. Call __triggerFetch(request)                                │
-│   3. Poll for __lastResponse (adaptive: 1µs → 1ms → 10ms)        │
+│   3. Wait for __lastResponse (notified by the event loop)        │
 │   4. Execute event loop for async operations                     │
 └─────────────────────────────────────────────────────────────────┘
                               │
@@ -189,9 +189,9 @@ pub enum ResponseBody {
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│                    Actix-web Response                            │
+│                      Hyper Response                              │
 │                                                                  │
-│   • ResponseBody::Stream → actix BodyStream                      │
+│   • ResponseBody::Stream → hyper StreamBody                      │
 │   • Chunks sent as HTTP chunked encoding                         │
 │   • Client receives data as it's produced                        │
 └─────────────────────────────────────────────────────────────────┘
@@ -203,20 +203,21 @@ pub enum ResponseBody {
 
 ### Where Streaming Works
 
-| Use Case                 | Supported | Notes                      |
-| ------------------------ | --------- | -------------------------- |
-| SSE (Server-Sent Events) | ✅        | Response streams to client |
-| Large file download      | ✅        | Fetch response → client    |
-| Chunked API responses    | ✅        | Progressive JSON, etc.     |
-| Proxy pass-through       | ✅        | Fetch → forward to client  |
+| Use Case                 | Supported | Notes                                                |
+| ------------------------ | --------- | ---------------------------------------------------- |
+| SSE (Server-Sent Events) | ✅        | Response streams to client                           |
+| Large file download      | ✅        | Fetch response → client                              |
+| Chunked API responses    | ✅        | Progressive JSON, etc.                               |
+| Proxy pass-through       | ✅        | Fetch → forward to client                            |
+| Request body             | ✅        | Client sends the `x-request-body-stream` header      |
+| WebSocket                | ✅        | Outbound; see [WebSockets](/docs/workers/websockets) |
 
 ### Where Streaming Does NOT Work
 
-| Use Case            | Supported | Workaround             |
-| ------------------- | --------- | ---------------------- |
-| Large file upload   | ❌        | Use presigned S3 URLs  |
-| Streaming POST body | ❌        | Buffer in client first |
-| WebSocket           | ❌        | Not implemented yet    |
+| Use Case            | Supported | Notes                                                  |
+| ------------------- | --------- | ------------------------------------------------------ |
+| Large file upload   | ❌        | Streamed bodies are size-capped; use presigned S3 URLs |
+| Outgoing fetch body | ❌        | Buffered before the request is sent                    |
 
 ### Backpressure
 
@@ -238,33 +239,26 @@ If the consumer is slow, the producer waits. Memory usage stays bounded.
 
 ---
 
-## Timing and Polling
+## Waiting for the Response
 
-### Response Polling
-
-The V8 runtime polls for response completion:
+The execution loop is event-driven: it waits on a notification from the scheduler and wakes up as soon as a callback result is ready. A short timer bounds the wait so the loop keeps checking the timeout guards even when no callback arrives.
 
 ```rust
-// Adaptive polling: starts fast, slows down
-let mut sleep_duration = Duration::from_micros(1);
+loop {
+    self.runtime.process_callbacks();
 
-for iteration in 0..5000 {  // ~5 second timeout
-    if has_response() {
+    if response_ready {
         break;
     }
 
-    tokio::time::sleep(sleep_duration).await;
-
-    // Increase sleep after initial fast polling
-    if iteration == 100 {
-        sleep_duration = Duration::from_millis(1);
-    } else if iteration == 500 {
-        sleep_duration = Duration::from_millis(10);
+    tokio::select! {
+        _ = callback_notify.notified() => {}                       // Result ready
+        _ = tokio::time::sleep(Duration::from_millis(10)) => {}    // Guard check
     }
 }
 ```
 
-This balances latency (fast initial polling) with CPU usage (slower later).
+See [Event Loop](/docs/architecture/event-loop) for the full picture.
 
 ---
 
@@ -282,17 +276,17 @@ This balances latency (fast initial polling) with CPU usage (slower later).
 
 ## Gotchas
 
-### Request Bodies Are Always Buffered
+### Request Bodies Are Buffered by Default
 
 ```javascript
-// This works, but body is fully buffered first
+// This works, but the body is fully buffered first
 addEventListener('fetch', async (event) => {
   const body = await event.request.text(); // Already buffered
   // ...
 });
 ```
 
-For large uploads, use presigned S3 URLs instead.
+The client opts into a streamed body with the `x-request-body-stream` header. For large uploads, use presigned S3 URLs instead.
 
 ### Fetch Request Bodies Are Also Buffered
 

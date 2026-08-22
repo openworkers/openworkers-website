@@ -12,7 +12,7 @@ Run your static site generator's build command:
 
 ```bash
 # Vite
-npm run build
+bun run build
 
 # Astro
 astro build
@@ -26,19 +26,19 @@ hugo
 ### 2. Generate OpenWorkers bundle
 
 ```bash
-npx @openworkers/adapter-static ./dist -o ./dist-ow
+bunx @openworkers/adapter-static ./dist -o ./dist-ow
 ```
 
 This generates:
 
 ```
 dist-ow/
-├── worker.js      # Worker that serves static files
-├── routes.js      # Routing manifest
+├── _worker.js     # Worker that serves static files
+├── _routes.json   # Routing manifest
 └── assets/        # Your static files
 ```
 
-### 4. Deploy
+### 3. Deploy
 
 ```bash
 ow workers upload my-site ./dist-ow
@@ -65,7 +65,7 @@ ow workers create my-site
 ow workers link my-site my-site-env
 
 # 6. Build and upload
-npx @openworkers/adapter-static ./dist -o ./dist-ow
+bunx @openworkers/adapter-static ./dist -o ./dist-ow
 ow workers upload my-site ./dist-ow
 ```
 
@@ -74,7 +74,7 @@ Your site is now live at `https://my-site.workers.rocks`
 ## CLI Options
 
 ```bash
-npx @openworkers/adapter-static [input] [options]
+bunx @openworkers/adapter-static [input] [options]
 ```
 
 | Option    | Flag             | Default            | Description                                |
@@ -89,16 +89,16 @@ npx @openworkers/adapter-static [input] [options]
 
 ```bash
 # Auto-detect input folder
-npx @openworkers/adapter-static
+bunx @openworkers/adapter-static
 
 # Specify input and output
-npx @openworkers/adapter-static ./build -o ./dist
+bunx @openworkers/adapter-static ./build -o ./dist
 
 # SPA mode (fallback to index.html)
-npx @openworkers/adapter-static --fallback /index.html
+bunx @openworkers/adapter-static --fallback /index.html
 
 # Force routing mode
-npx @openworkers/adapter-static --mode flat
+bunx @openworkers/adapter-static --mode flat
 ```
 
 ## Routing Modes
@@ -128,7 +128,7 @@ Used by SvelteKit static export and some others:
 For single-page applications, use the `--fallback` option:
 
 ```bash
-npx @openworkers/adapter-static --fallback /index.html
+bunx @openworkers/adapter-static --fallback /index.html
 ```
 
 This serves `/index.html` for all routes that don't match a file, letting your client-side router handle navigation.
@@ -149,7 +149,7 @@ Auto-detected patterns:
 You can override with `--immutable`:
 
 ```bash
-npx @openworkers/adapter-static --immutable "/static/js/*,/static/css/*"
+bunx @openworkers/adapter-static --immutable "/static/js/*,/static/css/*"
 ```
 
 ## Programmatic API
@@ -169,7 +169,7 @@ await adapt({
 
 ## How It Works
 
-The generated `worker.js`:
+The generated `_worker.js`:
 
 1. Receives HTTP requests
 2. Tries to serve the exact file path via `env.ASSETS.fetch()`
@@ -199,13 +199,13 @@ The worker automatically sets appropriate cache headers:
 
 ```bash
 # Create and build
-npm create vite@latest my-app -- --template react
+bun create vite my-app --template react
 cd my-app
-npm install
-npm run build
+bun install
+bun run build
 
 # Deploy to OpenWorkers
-npx @openworkers/adapter-static ./dist -o ./dist-ow --fallback /index.html
+bunx @openworkers/adapter-static ./dist -o ./dist-ow --fallback /index.html
 ow workers upload my-app ./dist-ow
 ```
 
@@ -213,11 +213,11 @@ ow workers upload my-app ./dist-ow
 
 ```bash
 # Create and build
-npm create astro@latest my-blog
+bun create astro my-blog
 cd my-blog
-npm run build
+bun run build
 
 # Deploy to OpenWorkers
-npx @openworkers/adapter-static ./dist -o ./dist-ow
+bunx @openworkers/adapter-static ./dist -o ./dist-ow
 ow workers upload my-blog ./dist-ow
 ```

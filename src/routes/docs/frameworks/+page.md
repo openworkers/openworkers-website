@@ -81,13 +81,13 @@ curl -X POST https://dash.openworkers.com/api/v1/environments \
 curl -X PATCH https://dash.openworkers.com/api/v1/environments/<env-id> \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
-  -d '{"values": [{"key": "ASSETS", "value": "<storage-id>", "valueType": "assets"}]}'
+  -d '{"values": [{"key": "ASSETS", "value": "<storage-id>", "type": "assets"}]}'
 
 # 4. Create worker
 curl -X POST https://dash.openworkers.com/api/v1/workers \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
-  -d '{"name": "my-site"}'
+  -d '{"name": "my-site", "language": "javascript"}'
 
 # 5. Link environment to worker
 curl -X PATCH https://dash.openworkers.com/api/v1/workers/<worker-id> \
@@ -95,7 +95,7 @@ curl -X PATCH https://dash.openworkers.com/api/v1/workers/<worker-id> \
   -H "Content-Type: application/json" \
   -d '{"environment": "<env-id>"}'
 
-# 6. Upload (zip with worker.js + assets/)
+# 6. Upload (zip with _worker.js + assets/)
 curl -X POST https://dash.openworkers.com/api/v1/workers/<worker-id>/upload \
   -H "Authorization: Bearer $TOKEN" \
   -F "file=@dist.zip"

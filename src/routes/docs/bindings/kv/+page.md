@@ -33,7 +33,7 @@ ow env create my-env
 ow env bind my-env KV my-cache --type kv
 
 # Link environment to worker
-ow workers link my-worker --env my-env
+ow workers link my-worker my-env
 ```
 
       </div>
@@ -55,7 +55,7 @@ curl -X PATCH https://dash.openworkers.com/api/v1/environments/my-env \
     "values": [{
       "key": "KV",
       "value": "<kv-id>",
-      "valueType": "kv"
+      "type": "kv"
     }]
   }'
 ```
@@ -204,7 +204,7 @@ if (flags.newCheckout) {
 ### Rate limiting with auto-expiration
 
 ```javascript
-const ip = request.headers.get('CF-Connecting-IP');
+const ip = request.headers.get('X-Real-IP');
 const key = `ratelimit:${ip}`;
 const count = (await env.KV.get(key)) || 0;
 

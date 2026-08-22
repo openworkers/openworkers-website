@@ -63,6 +63,7 @@ async function handleRequest(request: Request): Promise<Response> {
 interface FetchEvent {
   request: Request;
   respondWith(response: Response | Promise<Response>): void;
+  waitUntil(promise: Promise<unknown>): void;
 }
 ```
 

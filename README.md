@@ -11,14 +11,19 @@ bun install
 bun run dev
 ```
 
+To produce the static site that gets deployed, run `bun run build`. The prerendered
+output lands in `build/`.
+
 ## Deployment
 
 The website is [automatically deployed to GitHub Pages](https://github.com/marketplace/actions/deploy-to-github-pages) when changes are pushed to the master branch.
 
 ## Contributing
 
-If you want to contribute to the OpenWorkers documentation, please read the [contributing guidelines](CONTRIBUTING.md).
+If you want to contribute to the OpenWorkers documentation, open an issue or a pull
+request on [the repository](https://github.com/openworkers/openworkers-website).
 
 ## License
 
-The OpenWorkers website is licensed under the [CC BY-SA 4.0 and CC0 1.0 Universal licenses](LICENSE).
+Prose is licensed under CC BY-SA 4.0, code examples under CC0 1.0 Universal. See
+[LICENSE](LICENSE) for the full text of both.

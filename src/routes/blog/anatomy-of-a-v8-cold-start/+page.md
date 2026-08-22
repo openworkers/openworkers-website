@@ -41,7 +41,7 @@ cycle, because caching with eager compilation also covers the inner functions
 that lazy compilation would otherwise compile mid-render. Anyone measuring
 only "time to create a worker" understates the cache by half. Second, the
 cache is not free: the packed blob is 715 KB for a 303 KB bundle, 2.3x the
-source, and it is specific to the engine configuration it was compiled under:
+source, and it is specific to the engine configuration it was compiled under -
 a cache built with a snapshot present differs from one built without.
 
 Parsing itself is cheaper than folklore says: V8 pre-parses and defers inner
@@ -51,7 +51,7 @@ cost across every wake.
 
 ## The GC detour: reproduce, then tune
 
-Cloudflare published that relaxing decade-old young-generation settings bought
+Cloudflare reported that relaxing decade-old young-generation settings bought
 them ~25% on CPU-heavy workers, and that GC ate 10-25% of Next.js SSR time.
 Our defaults had the same smell: deriving the young generation from a small
 per-worker heap cap left 4 MB semi-spaces where modern V8 defaults to 16 MB.

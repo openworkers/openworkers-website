@@ -4,7 +4,7 @@
 
 # Quick Start
 
-Deploy your first worker in 5 minutes using the **Dashboard** or the **CLI**.
+Deploy your first worker with the dashboard, the CLI, or the REST API.
 
 <Tabs tabs={['Dashboard', 'CLI', 'API']}>
   {#snippet children(active)}
@@ -13,7 +13,7 @@ Deploy your first worker in 5 minutes using the **Dashboard** or the **CLI**.
 
 ## 1. Create Account
 
-Sign in at [openworkers.com](https://openworkers.com) with your GitHub account.
+Sign in at [openworkers.com](https://openworkers.com).
 
 ## 2. Create Worker
 
@@ -56,14 +56,16 @@ Click **Save**. Your worker is live.
 cargo install openworkers-cli
 
 # Or download from releases
-# https://github.com/openworkers/cli/releases
+# https://github.com/openworkers/openworkers-cli/releases
 ```
 
 ## 2. Login
 
+Create an API token in **Settings** at [openworkers.com](https://openworkers.com), then:
+
 ```bash
 ow login
-# Opens browser for GitHub authentication
+# Prompts for the token and stores it in ~/.openworkers/config.json
 ```
 
 ## 3. Create Worker

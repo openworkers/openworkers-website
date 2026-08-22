@@ -153,7 +153,7 @@ Protects against slow operations (network waits, infinite loops with sleep):
 ```rust
 // Watchdog thread spawned per execution
 thread::spawn(move || {
-    match cancel_rx.recv_timeout(Duration::from_secs(30)) {
+    match cancel_rx.recv_timeout(Duration::from_secs(60)) {
         Ok(()) => { /* completed normally */ }
         Err(Timeout) => {
             isolate_handle.terminate_execution();
@@ -162,7 +162,7 @@ thread::spawn(move || {
 });
 ```
 
-**Default:** 30 seconds
+**Default:** 60 seconds
 
 **Cancellation:** When worker completes, signal sent to watchdog thread for cleanup.
 
@@ -207,6 +207,7 @@ Workers have access to a limited set of Web APIs:
 | **Text**        | `TextEncoder`, `TextDecoder`, `btoa()`, `atob()`                     |
 | **Web APIs**    | `Blob`, `File`, `FormData`, `Headers`, `Request`, `Response`         |
 | **Streams**     | `ReadableStream`, `WritableStream`, `TransformStream`                |
+| **WebSocket**   | `WebSocket` (outbound), see [WebSockets](/docs/workers/websockets)   |
 | **URL**         | `URL`, `URLSearchParams`                                             |
 | **Performance** | `performance.now()` (100µs precision)                                |
 
@@ -226,7 +227,7 @@ The following are intentionally NOT available:
 | --------------------- | ------------------------------------------------ |
 | **File System**       | No `fs`, no disk access                          |
 | **Child Processes**   | No `spawn()`, `exec()`                           |
-| **Raw Sockets**       | No TCP/UDP, only HTTP via fetch                  |
+| **Raw Sockets**       | No TCP/UDP; HTTP via fetch, plus WebSocket       |
 | **Module System**     | No `require()`, no dynamic imports               |
 | **Environment**       | No `process.env` (use `env` binding instead)     |
 | **System Calls**      | Rust boundary prevents libc access               |

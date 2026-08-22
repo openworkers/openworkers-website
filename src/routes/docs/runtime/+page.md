@@ -9,7 +9,7 @@ OpenWorkers implements standard Web APIs compatible with Cloudflare Workers and 
 - [Text Encoding](#text-encoding) — TextEncoder, TextDecoder, Base64
 - [Binary Data](#binary-data) — Blob, File, FormData
 - [Streams](#streams) — ReadableStream
-- [Crypto](#crypto) — Random, Hashing, HMAC
+- [Crypto](#crypto) — Random, Hashing, HMAC, AES, ECDSA, RSA, PBKDF2
 - [Timers](#timers) — setTimeout, setInterval
 - [Abort Controller](#abort-controller) — Cancel operations
 - [Console](#console) — Logging
@@ -250,11 +250,15 @@ for (const [key, value] of form) {
 Parse incoming form data:
 
 ```javascript
-addEventListener('fetch', async (event) => {
-  const form = await event.request.formData();
-  const name = form.get('name');
-  const file = form.get('file'); // File object
-});
+export default {
+  async fetch(request) {
+    const form = await request.formData();
+    const name = form.get('name');
+    const file = form.get('file'); // File object
+
+    return Response.json({ name, file: file?.name });
+  }
+};
 ```
 
 ---
@@ -370,6 +374,15 @@ const signature = await crypto.subtle.sign('HMAC', key, data);
 const isValid = await crypto.subtle.verify('HMAC', key, signature, data);
 ```
 
+### Other SubtleCrypto algorithms
+
+| Algorithm           | Operations                                                          |
+| ------------------- | ------------------------------------------------------------------- |
+| `AES-GCM`           | `encrypt`, `decrypt`, `generateKey`, `importKey`, `exportKey` (128 and 256 bit keys) |
+| `ECDSA` (P-256)     | `sign`, `verify`, `generateKey`, `importKey`                        |
+| `RSASSA-PKCS1-v1_5` | `sign`, `verify`, `importKey` (SHA-256, SHA-384, SHA-512)           |
+| `PBKDF2`            | `importKey`, `deriveBits` (SHA-1, SHA-256, SHA-384, SHA-512)        |
+
 ---
 
 ## Timers
@@ -474,6 +487,6 @@ global; // Alias (Node.js compatibility)
 
 - **No dynamic imports** — Code must be pre-bundled. Use `esbuild` or similar to bundle your code before deploying. The `export default` handler syntax works, but `import './module.js'` at runtime does not.
 - **No DOM** — No `document`, `window`, or browser-specific APIs
-- **No WebSocket** — Only HTTP via Fetch API
+- **No inbound WebSocket** — Outbound WebSocket connections are supported, accepting connections from clients is in beta. See [WebSockets](/docs/workers/websockets).
 - **No Node.js APIs** — No `fs`, `path`, `process`, etc.
 - **Single-threaded** — No Web Workers or shared memory

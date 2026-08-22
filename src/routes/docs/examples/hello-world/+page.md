@@ -71,5 +71,5 @@ export default {
 Test with:
 
 ```bash
-curl "https://your-worker.openworkers.com/?name=Alice"
+curl "https://your-worker.workers.rocks/?name=Alice"
 ```

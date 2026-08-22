@@ -1,6 +1,6 @@
 # Create a proxy to S3
 
-The following example shows how to read from S3 without using any module.
+The following example shows how to read from S3 without any dependencies.
 
 See [S3 documentation](https://docs.aws.amazon.com/AmazonS3/latest/userguide/RESTAuthentication.html) for more information.
 
@@ -16,7 +16,7 @@ Ensure that you have the following environment variables set:
 ## Reading from S3
 
 To read from S3, we need to sign the request using HMAC-SHA1, which is supported by the Web Crypto API.
-We define the `HMAC` function to sign the request, and the `getObject` function to prepare the request and send it to S3.
+We define the `HMAC` function to sign the request, and the `getS3Object` function to prepare the request and send it to S3.
 
 ```typescript
 async function HMAC(key: string, message: string) {
@@ -59,7 +59,7 @@ async function getS3Object(key: string) {
 }
 ```
 
-Now we use our `getObject` function to read from S3:
+Now we use our `getS3Object` function to read from S3:
 
 ```typescript
 addEventListener('fetch', (event: FetchEvent) => {
@@ -85,7 +85,7 @@ async function HMAC(key: string, message: string) {
   // ...
 }
 
-async function getObject(key: string) {
+async function getS3Object(key: string) {
   // ...
 }
 

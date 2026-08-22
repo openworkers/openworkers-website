@@ -24,8 +24,10 @@ export default {
 
 | | |
 |---|---|
-| [Quick Start](/docs/quickstart) | Deploy your first worker in 5 minutes |
+| [Quick Start](/docs/quickstart) | Deploy your first worker |
+| [CLI](/docs/cli) | Deploy and manage workers from the terminal |
 | [Workers](/docs/workers/event-fetch) | HTTP handlers and scheduled tasks |
 | [Bindings](/docs/bindings) | Storage, KV, Database connections |
 | [Runtime APIs](/docs/runtime) | Full API reference |
+| [Examples](/docs/examples) | Ready-to-deploy worker code |
 | [Self-Hosting](/docs/self-hosting) | Run on your own infrastructure |

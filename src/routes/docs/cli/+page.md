@@ -50,9 +50,14 @@ ow workers list
 
 ## Authentication
 
+Create an API token in the dashboard, then store it in the current alias:
+
 ```bash
-# Login to API (opens browser)
+# Prompts for an API token
 ow login
+
+# Login to a specific alias
+ow prod login
 
 # The token is stored in ~/.openworkers/config.json
 ```
@@ -103,7 +108,7 @@ ow workers deploy my-api worker.ts --message "Add new endpoint"
 Upload a folder or zip with worker script and assets:
 
 ```bash
-# Upload folder (must contain worker.js/worker.ts and assets/ folder)
+# Upload folder (must contain the worker script at the root)
 ow workers upload <name> ./dist
 
 # Upload zip file
@@ -114,12 +119,17 @@ ow workers upload <name> ./package.zip
 
 ```
 dist/
-├── worker.js      # Main worker script (required)
+├── _worker.js     # Main worker script (required)
+├── _routes.json   # Route manifest (optional)
 └── assets/        # Static assets (optional)
     ├── index.html
     ├── style.css
     └── ...
 ```
+
+The worker script is picked up under any of these names: `_worker.js`, `_worker.ts`,
+`worker.js`, `worker.ts`. Serving the `assets/` folder requires an `ASSETS` binding
+on the linked environment.
 
 ### Link Environment
 
@@ -225,8 +235,17 @@ ow storage get <name>
 
 ### Create Storage
 
+Platform-managed storage (default provider):
+
+```bash
+ow storage create <name>
+```
+
+Bring your own S3-compatible bucket:
+
 ```bash
 ow storage create <name> \
+  --provider s3 \
   --bucket my-bucket \
   --endpoint https://xxx.r2.cloudflarestorage.com \
   --access-key-id AKIAIOSFODNN7EXAMPLE \
@@ -309,30 +328,29 @@ ow databases rm <name>
 
 ---
 
-## Database Operations (Self-Hosted)
+## Migrations (Self-Hosted)
 
-For direct database access (self-hosted setups):
-
-### Run Migrations
+Migrations run against a database alias, so prefix them with the alias name:
 
 ```bash
-ow db migrate
-```
+# Show applied and pending migrations
+ow local migrate status
 
-### Seed Data
+# Run pending migrations
+ow local migrate run
 
-```bash
-ow db seed
+# Mark all migrations as applied (existing database with the schema already in place)
+ow local migrate baseline
 ```
 
 ---
 
 ## Platform Storage Setup
 
-Configure platform-wide storage for asset uploads (self-hosted):
+Configure platform-wide storage for asset uploads (database alias, self-hosted):
 
 ```bash
-ow setup-storage \
+ow local setup-storage \
   --endpoint https://xxx.r2.cloudflarestorage.com \
   --bucket platform-assets \
   --access-key-id AKIAIOSFODNN7EXAMPLE \
@@ -363,7 +381,7 @@ ow kv create my-cache
 ow env bind my-api-env CACHE my-cache --type kv
 
 # 5. Link environment to worker
-ow workers link my-api --env my-api-env
+ow workers link my-api my-api-env
 
 # 6. Deploy
 ow workers deploy my-api ./worker.ts
@@ -375,8 +393,8 @@ ow workers deploy my-api ./worker.ts
 # Build your SvelteKit app
 bun run build
 
-# Upload the dist folder
-ow workers upload my-app ./dist
+# Upload the build folder
+ow workers upload my-app ./build
 ```
 
 ---

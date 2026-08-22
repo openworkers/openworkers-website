@@ -86,8 +86,8 @@ async function verifyJWT(token: string, secret: string): Promise<object | null> 
     return null;
   }
 
-  // Decode payload
-  const payload = JSON.parse(atob(payloadB64));
+  // Decode payload (base64url)
+  const payload = JSON.parse(atob(payloadB64.replace(/-/g, '+').replace(/_/g, '/')));
 
   // Check expiration
   if (payload.exp && payload.exp < Date.now() / 1000) {
@@ -138,7 +138,7 @@ async function withAuth(
   const token = auth.slice(7);
 
   // Validate token (simplified - use JWT in production)
-  const user = await env.KV.get(`session:${token}`, 'json');
+  const user = await env.KV.get(`session:${token}`);
 
   if (!user) {
     return Response.json({ error: 'Invalid session' }, { status: 403 });

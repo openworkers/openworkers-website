@@ -1,6 +1,6 @@
 # Create a proxy to S3 using AWS v4 signature type
 
-The following example shows how to read from S3 using AWS v4 signature type without using any module.
+The following example shows how to read from S3 with the AWS v4 signature, without any dependencies.
 
 See [S3 documentation](https://docs.aws.amazon.com/IAM/latest/UserGuide/create-signed-request.html) for more information.
 
@@ -12,11 +12,12 @@ Ensure that you have the following environment variables set:
 - `S3_ACCESS_KEY`: The access key of the S3-compatible storage.
 - `S3_SECRET_KEY`: The secret key of the S3-compatible storage.
 - `S3_REGION`: The region of the S3-compatible storage.
+- `S3_ENDPOINT`: The endpoint of the S3-compatible storage. For example `https://example.s3.fr-par.scw.cloud`.
 
 ## Reading from S3
 
-To read from S3, we need to sign the request using HMAC-SHA1, which is supported by the Web Crypto API.
-We define the `HMAC` function to sign the request, and the `getObject` function to prepare the request and send it to S3.
+To read from S3, we need to sign the request using HMAC-SHA256, which is supported by the Web Crypto API.
+We define the `HMAC` function to sign the request, and the `getS3Object` function to prepare the request and send it to S3.
 
 ```typescript
 const s3 = {

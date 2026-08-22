@@ -23,6 +23,7 @@ Blob storage for files and binary data. Backed by S3-compatible object storage (
 ```bash
 # Create storage config
 ow storage create my-storage \
+  --provider s3 \
   --bucket my-bucket \
   --endpoint https://xxx.r2.cloudflarestorage.com \
   --access-key-id AKIAIOSFODNN7EXAMPLE \
@@ -32,7 +33,7 @@ ow storage create my-storage \
 ow env bind my-env STORAGE my-storage --type storage
 
 # Link environment to worker
-ow workers link my-worker --env my-env
+ow workers link my-worker my-env
 ```
 
       </div>
@@ -46,6 +47,7 @@ curl -X POST https://dash.openworkers.com/api/v1/storage \
   -H "Content-Type: application/json" \
   -d '{
     "name": "my-storage",
+    "provider": "s3",
     "bucket": "my-bucket",
     "endpoint": "https://xxx.r2.cloudflarestorage.com",
     "accessKeyId": "AKIAIOSFODNN7EXAMPLE",
@@ -60,7 +62,7 @@ curl -X PATCH https://dash.openworkers.com/api/v1/environments/my-env \
     "values": [{
       "key": "STORAGE",
       "value": "<storage-id>",
-      "valueType": "storage"
+      "type": "storage"
     }]
   }'
 ```
@@ -107,15 +109,17 @@ addEventListener('fetch', async (event) => {
 
 ### get(key)
 
-Read a file. Returns `null` if the key doesn't exist.
+Read a file. The body is returned as UTF-8 text, and `null` if the key doesn't exist.
 
 ```javascript
-const data = await env.STORAGE.get('uploads/image.png');
+const data = await env.STORAGE.get('uploads/notes.txt');
 
 if (!data) {
   console.log('File not found');
 }
 ```
+
+To serve binary objects (images, archives), use `env.STORAGE.fetch(path)`, which returns a `Response` with the bytes untouched.
 
 ### put(key, value)
 
@@ -291,10 +295,10 @@ Config:
 
 ## Assets vs Storage
 
-| Feature  | Assets                         | Storage                       |
-| -------- | ------------------------------ | ----------------------------- |
-| Access   | Read-only                      | Read/Write                    |
-| Use case | Static files (images, CSS, JS) | Dynamic files (uploads, data) |
-| API      | `env.ASSETS.fetch(path)`       | `env.STORAGE.get/put/delete`  |
+| Feature  | Assets                         | Storage                            |
+| -------- | ------------------------------ | ---------------------------------- |
+| Access   | Read-only                      | Read/Write                         |
+| Use case | Static files (images, CSS, JS) | Dynamic files (uploads, data)      |
+| API      | `env.ASSETS.fetch(path)`       | `env.STORAGE.get/put/delete/fetch` |
 
 Use **Assets** for static content that doesn't change. Use **Storage** when you need to write or delete files.

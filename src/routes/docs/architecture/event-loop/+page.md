@@ -349,7 +349,7 @@ async fn exec(&mut self, task: Task) {
         // Wait for scheduler to signal callback ready (event-driven)
         tokio::select! {
             _ = callback_notify.notified() => {}  // Wake immediately
-            _ = tokio::time::sleep(100ms) => {}   // Periodic guard check
+            _ = tokio::time::sleep(10ms) => {}    // Periodic guard check
         }
     }
 }

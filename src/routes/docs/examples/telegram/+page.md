@@ -2,11 +2,11 @@
 
 ## Introduction
 
-This example shows how to write a Telegram bot without using any module.
+This example shows how to write a Telegram bot without any dependencies.
 
 ## Setup bot
 
-First of all, you need to create a bot. To do this, you need to talk to the [@BotFather](https://t.me/BotFather) bot and follow a few simple steps. After that, you will receive a token that you will need to use to interact with your bot.
+First of all, you need to create a bot. To do this, talk to the [@BotFather](https://t.me/BotFather) bot and follow its steps. You then receive a token to use when interacting with your bot.
 
 ## Setup environment variables
 
@@ -104,8 +104,6 @@ async function handleRequest(request: Request): Promise<Response> {
 ```
 
 You can now verify that everything has been set up correctly by sending a message to your bot.
-
-Happy coding!
 
 ## References
 

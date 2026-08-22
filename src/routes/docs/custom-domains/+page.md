@@ -8,7 +8,7 @@ Custom domains require your domain to be managed by **Cloudflare** (the free pla
 
 Every worker is already reachable at `<name>.workers.rocks` — no setup needed.
 
-A custom domain is an extra hostname routed to the same worker. Requests are matched on the `Host` header, so once traffic reaches our infrastructure, routing is automatic.
+A custom domain is an extra hostname routed to the same worker. When a request arrives with a hostname the proxy does not already know, the proxy asks the API which worker owns that hostname and caches the answer for 30 seconds. A domain you just added therefore starts serving within that window.
 
 Your Cloudflare zone terminates TLS for your domain (certificates are issued and renewed automatically by Cloudflare), then forwards requests — encrypted — to our origin. This is why Cloudflare is required: it is what makes SSL work for your domain without any manual step.
 

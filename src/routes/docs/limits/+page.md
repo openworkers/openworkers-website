@@ -34,7 +34,7 @@ This is the maximum time a worker can run, including all waiting time.
 await new Promise((resolve) => setTimeout(resolve, 120_000)); // 2 minutes
 ```
 
-**When exceeded:** Returns `408 Request Timeout` with header `X-Termination-Reason: WallClockTimeout`
+**When exceeded:** Returns `504 Gateway Timeout` with header `X-Termination-Reason: WallClockTimeout`
 
 ---
 
@@ -56,7 +56,7 @@ for (let i = 0; i < 10_000_000; i++) {
 }
 ```
 
-**When exceeded:** Returns `503 Service Unavailable` with header `X-Termination-Reason: MemoryLimit`
+**When exceeded:** Returns `429 Too Many Requests` with header `X-Termination-Reason: MemoryLimit`
 
 ---
 
@@ -73,8 +73,8 @@ Possible values:
 | Value              | HTTP Status | Meaning                    |
 | ------------------ | ----------- | -------------------------- |
 | `CpuTimeLimit`     | 429         | Exceeded 100ms CPU time    |
-| `WallClockTimeout` | 408         | Exceeded 60s total time    |
-| `MemoryLimit`      | 503         | Exceeded memory allocation |
+| `WallClockTimeout` | 504         | Exceeded 60s total time    |
+| `MemoryLimit`      | 429         | Exceeded memory allocation |
 | `Exception`        | 500         | Unhandled JavaScript error |
 
 ---
@@ -89,7 +89,7 @@ function fibonacci(n) {
   if (n <= 1) return n;
   return fibonacci(n - 1) + fibonacci(n - 2);
 }
-fibonacci(45); // Will timeout
+fibonacci(45); // Exceeds the CPU time limit
 
 // Good - use memoization or iterative approach
 function fibonacciIterative(n) {
@@ -182,7 +182,7 @@ return new Response(stream, {
 | Resource   | Limit  | On Exceed |
 | ---------- | ------ | --------- |
 | CPU Time   | 100ms  | 429       |
-| Wall Clock | 60s    | 408       |
-| Memory     | 128 MB | 503       |
+| Wall Clock | 60s    | 504       |
+| Memory     | 128 MB | 429       |
 
 These limits apply to both `fetch` events (HTTP requests) and `scheduled` events (cron jobs).

@@ -1,7 +1,7 @@
 ---
 title: Five engines, one page, one sha256
 date: '2026-08-19'
-description: How a conformance oracle made five JavaScript engines render the same SvelteKit page byte-for-byte, and what it caught along the way.
+description: How a conformance oracle made five JavaScript engines render the same SvelteKit page byte-for-byte, and the bugs it caught - including one in the reference engine.
 ---
 
 OpenWorkers runs workers on more than one JavaScript engine: V8 in production,
@@ -36,7 +36,7 @@ every form action returned a 500 on three engines, for the same missing
 method. One fixture, one gap, found three times in an afternoon.
 
 **Duplicate `Set-Cookie` headers were collapsed.** Two engines joined repeated
-headers with a comma, which is correct for `link` and destructive for
+headers with a comma, which is correct for `Link` and destructive for
 `Set-Cookie`. Seven of the 17 scenarios emit two or three cookies, so the
 oracle showed exactly which cookie disappeared and where.
 

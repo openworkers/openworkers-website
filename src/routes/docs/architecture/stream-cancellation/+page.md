@@ -64,7 +64,7 @@ export default {
             break;
           }
 
-          controller.enqueue(`data: event ${i}\\n\\n`);
+          controller.enqueue(`data: event ${i}\n\n`);
           await new Promise((r) => setTimeout(r, 100));
         }
 
@@ -91,7 +91,7 @@ export default {
       async start(controller) {
         try {
           for (let i = 0; i < 100; i++) {
-            controller.enqueue(`data: event ${i}\\n\\n`);
+            controller.enqueue(`data: event ${i}\n\n`);
             await new Promise((r) => setTimeout(r, 100));
           }
           controller.close();
@@ -306,7 +306,7 @@ async start(controller) {
         // Stream logic that might outlive the client
         controller.enqueue(data);
     } catch (error) {
-        if (error.message.includes('cancelled')) {
+        if (error.message.includes('client disconnected')) {
             // Expected - client disconnected
         } else {
             throw error;
@@ -377,7 +377,7 @@ You can test cancellation behavior with curl:
 
 ```bash
 # Start streaming request
-curl -N 'https://your-worker.workers.dev/stream'
+curl -N 'https://your-worker.workers.rocks/stream'
 
 # Press Ctrl+C to disconnect
 # Worker should detect and stop
@@ -387,7 +387,7 @@ Or with a timeout:
 
 ```bash
 # Disconnect after 2 seconds
-timeout 2 curl -N 'https://your-worker.workers.dev/stream'
+timeout 2 curl -N 'https://your-worker.workers.rocks/stream'
 ```
 
 ---

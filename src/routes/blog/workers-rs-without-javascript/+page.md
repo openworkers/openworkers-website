@@ -59,7 +59,7 @@ itself.
 That port also found the SDK's best bug. A spawned task _finishing_ emptied
 the cooperative task queue, which the executor misread as "nothing can wake
 the handler" and aborted the request - precisely the oneshot-bridge shape
-real apps use and 14 integration tests had not. Nothing audits an SDK like an
+real apps use and 14 integration tests did not. Nothing audits an SDK like an
 application.
 
 ## Go, and what its numbers teach
@@ -79,8 +79,8 @@ The numbers are the interesting part:
 
 That 605 ms is not the handler: it is Go runtime initialization, charged on
 every request because the runtime currently instantiates a fresh component
-per event. A _smaller_ handler measured worse (839 ms) - less data section
-means more heap to initialize. Go fits the default budget only by giving up
+per event. A _smaller_ handler measured worse (839 ms) - a smaller data
+section means more heap to initialize. Go fits the default budget only by giving up
 its GC and goroutines, which is not a trade to hide in a README. The honest
 fix is structural - warm instances per worker - and it is the same item that
 tops the runtime's backlog for Rust cold starts too.

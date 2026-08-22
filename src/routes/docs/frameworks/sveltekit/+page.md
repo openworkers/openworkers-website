@@ -7,7 +7,7 @@ Deploy SvelteKit applications with full SSR support on OpenWorkers.
 ### 1. Install the adapter
 
 ```bash
-npm install @openworkers/adapter-sveltekit
+bun add -d @openworkers/adapter-sveltekit
 ```
 
 ### 2. Configure SvelteKit
@@ -32,31 +32,32 @@ export default config;
 ### 3. Build
 
 ```bash
-npm run build
+bun run build
 ```
 
-This generates a `dist/` folder with:
+This generates a `build/` folder with:
 
 ```
-dist/
-├── worker.js      # Bundled worker (SSR + routing)
-├── routes.js      # Routing hints for edge optimization
-└── assets/        # Static files (_app/, images, etc.)
+build/
+├── _worker.js     # Bundled worker (SSR + routing)
+├── _routes.json   # Route manifest
+└── assets/        # Static files (_app/, prerendered pages, images)
 ```
 
 ### 4. Deploy
 
-Create a ZIP and upload via the API or CLI:
+Upload the build folder with the CLI:
 
 ```bash
-cd dist
-zip -r ../deploy.zip worker.js routes.js assets/
-ow deploy ../deploy.zip
+ow workers upload my-app ./build
 ```
+
+The worker must already have an `ASSETS` binding on its environment. See
+[Deploying via API](#deploying-via-api) for the full setup.
 
 ## How It Works
 
-The adapter bundles your SvelteKit app into a single `worker.js` file that:
+The adapter bundles your SvelteKit app into a single `_worker.js` file that:
 
 1. **Serves static assets** via `env.ASSETS.fetch()` for files in `/_app/` and `/static/`
 2. **Handles SSR** for dynamic routes using SvelteKit's `Server` class
@@ -72,8 +73,8 @@ Request → Worker
 
 ```javascript
 adapter({
-  // Output directory (default: 'dist')
-  out: 'build',
+  // Output directory (default: 'build')
+  outDir: 'build',
 
   // Generate separate mini-workers for each API route (default: false)
   functions: true
@@ -82,26 +83,27 @@ adapter({
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
-| `out` | `string` | `'dist'` | Output directory for the build |
+| `outDir` | `string` | `'build'` | Output directory for the build |
 | `functions` | `boolean` | `false` | Generate separate mini-workers for each API route |
+| `nodeCompat` | `boolean` | `false` | Include shims for Node.js built-in modules |
 
 ### Functions Mode
 
 When `functions: true`, the adapter generates a separate mini-worker for each `+server.ts` endpoint:
 
 ```
-dist/
-├── worker.js           # Main SSR worker
-├── routes.js
+build/
+├── _worker.js          # Main SSR worker
+├── _routes.json
 ├── assets/
 └── functions/          # Mini-workers for API routes
     ├── api-hello.js
     └── api-users.js
 ```
 
-The route mappings are included in `routes.js`:
+The route mappings are included in `_routes.json`:
 
-```javascript
+```json
 {
   "functions": [
     { "pattern": "/api/hello", "worker": "functions/api-hello.js" },
@@ -110,14 +112,14 @@ The route mappings are included in `routes.js`:
 }
 ```
 
-This prepares for native project routing where each function can be deployed as a separate worker for better isolation and scaling.
+Each API route keeps its own bundle, and `_routes.json` maps the request path to it.
 
 ## TypeScript Setup
 
 For proper types on `platform.env`, install the types package:
 
 ```bash
-npm install -D @openworkers/workers-types
+bun add -d @openworkers/workers-types
 ```
 
 Then update `src/app.d.ts`:
@@ -157,24 +159,26 @@ export async function load({ platform }) {
 Configure variables in your OpenWorkers environment:
 
 ```bash
-ow env set API_KEY=your-secret-key --secret
+ow env set my-app-env API_KEY your-secret-key --secret
 ```
 
 ## Static Assets
 
 Files in your `static/` folder are automatically uploaded to storage and served via `env.ASSETS`.
 
-The adapter generates a `routes.js` file that hints which paths are static:
+The adapter generates a `_routes.json` manifest that lists which paths are static:
 
-```javascript
-// routes.js (generated)
-export default {
-  immutable: ["/_app/immutable/*"],  // Cache forever (hashed)
-  static: ["/robots.txt", "/favicon.ico"],
-  prerendered: ["/about", "/contact"],
-  ssr: ["/*"]  // Everything else
-};
+```json
+{
+  "immutable": ["/_app/immutable/*"],
+  "static": ["/robots.txt", "/favicon.ico"],
+  "prerendered": ["/about", "/contact"],
+  "functions": [],
+  "ssr": ["/*"]
+}
 ```
+
+`immutable` paths are cached forever (hashed filenames), `ssr` covers everything else.
 
 ## Example: World Time App
 
@@ -277,10 +281,10 @@ Build your app, create a ZIP, and upload:
 
 ```bash
 # Build
-npm run build
+bun run build
 
 # Create ZIP
-cd dist && zip -r ../deploy.zip worker.js routes.js assets/
+cd build && zip -r ../deploy.zip _worker.js _routes.json assets/
 
 # Upload
 curl -X POST "https://dash.openworkers.com/api/v1/workers/{worker_id}/upload" \

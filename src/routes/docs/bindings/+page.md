@@ -4,7 +4,7 @@ Bindings connect your worker to external resources. They're injected via the `en
 
 ## Variables & Secrets
 
-Environment variables for configuration. Set them in the **Environments** tab of the dashboard.
+Environment variables for configuration. Set them in the **Environments** tab of the dashboard, or with `ow env set <environment> <KEY>`.
 
 ```javascript
 const apiUrl = env.API_URL; // Variable (visible in logs)
@@ -22,6 +22,7 @@ const apiKey = env.API_KEY; // Secret (hidden in logs)
 | [Storage](/docs/bindings/storage)   | Read/Write | Blob storage (S3/R2) with `get`, `put`, `head`, `list`, `delete` |
 | [KV](/docs/bindings/kv)             | Read/Write | Key-value store with TTL support                                 |
 | [Database](/docs/bindings/database) | Read/Write | PostgreSQL database with parameterized queries                   |
+| [Assets](/docs/frameworks/static)   | Read-only  | Static files from the worker bundle, served with `fetch(path)`   |
 
 ---
 

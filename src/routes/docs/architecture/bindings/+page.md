@@ -36,6 +36,7 @@ Bindings connect workers to external resources without exposing credentials. The
 | `storage`  | Blob storage (read/write) | S3/R2      |
 | `kv`       | Key-value with TTL        | PostgreSQL |
 | `database` | SQL queries               | PostgreSQL |
+| `worker`   | Calls another worker      | Runner     |
 
 ## Database Schema
 
@@ -43,7 +44,7 @@ Bindings connect workers to external resources without exposing credentials. The
 
 ```sql
 -- Binding type enum
-CREATE TYPE binding_type AS ENUM ('var', 'secret', 'assets', 'storage', 'kv');
+CREATE TYPE binding_type AS ENUM ('var', 'secret', 'assets', 'storage', 'kv', 'database', 'worker');
 
 -- Environment values (simple bindings)
 CREATE TABLE environment_values (
