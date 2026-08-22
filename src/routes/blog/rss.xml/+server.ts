@@ -1,6 +1,6 @@
 export const prerender = true;
 
-const SITE = 'https://openworkers.dev';
+const SITE = 'https://openworkers.com';
 
 interface PostMetadata {
   title: string;
