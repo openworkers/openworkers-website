@@ -64,11 +64,15 @@ bug above.
 ## The scoreboard
 
 The same philosophy now runs as a 448-assertion suite grounded in the
-WinterTC Minimum Common API, with one scoreboard per engine. The first run
-put V8 at 320/448, Boa at 319, QuickJS at 270 and JavaScriptCore at 268 - and
-84 assertions failed on all four, which is the most useful number of all:
-that is the part of the platform nobody ever implemented, starting with
-`EventTarget`.
+WinterTC Minimum Common API, with one scoreboard per engine. Measured on
+core 0.15, V8 sits at 353/448, Boa at 319, QuickJS at 270 and
+JavaScriptCore at 268 - and 77 assertions fail on all four, which is the
+most useful number of all: that is the part of the platform nobody ever
+implemented, starting with `EventTarget`.
+
+Nova renders the oracle page but sits out of the assertion suite: nova_vm
+pins a `temporal_rs` that wants one ICU generation, V8 152 pulls a
+`temporal_capi` that wants the next, and one lockfile cannot hold both.
 
 The suite exits non-zero only when the harness itself breaks. Failing guest
 assertions are the product, not an error: a scoreboard you can only look at
