@@ -179,10 +179,11 @@ return new Response(stream, {
 
 ## Limits Summary
 
-| Resource   | Limit  | On Exceed |
-| ---------- | ------ | --------- |
-| CPU Time   | 100ms  | 429       |
-| Wall Clock | 60s    | 504       |
-| Memory     | 128 MB | 429       |
+| Resource     | Limit  | On Exceed |
+| ------------ | ------ | --------- |
+| CPU Time     | 100ms  | 429       |
+| Wall Clock   | 60s    | 504       |
+| Memory       | 128 MB | 429       |
+| Request body | 10 MB  | 413       |
 
-These limits apply to both `fetch` events (HTTP requests) and `scheduled` events (cron jobs).
+These limits apply to both `fetch` events (HTTP requests) and `scheduled` events (cron jobs). The request body limit applies to `fetch` events, buffered or streamed with the `x-request-body-stream` header.
