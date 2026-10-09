@@ -100,8 +100,8 @@ pub enum ResponseBody {
 │                     V8 Runtime (Worker)                          │
 │                                                                  │
 │   1. Create JS Request object from HttpRequest                   │
-│   2. Call __triggerFetch(request)                                │
-│   3. Wait for __lastResponse (notified by the event loop)        │
+│   2. Call dispatch.fetch(request), which answers a handle        │
+│   3. Wait for handle.answer (read by the event loop)             │
 │   4. Execute event loop for async operations                     │
 └─────────────────────────────────────────────────────────────────┘
                               │
@@ -174,7 +174,7 @@ pub enum ResponseBody {
 │   event.respondWith(response);                                   │
 │              │                                                   │
 │              ▼                                                   │
-│   __streamResponseBody(response):                                │
+│   streamBody(response):                                          │
 │     • If native stream: use stream_id directly                   │
 │     • Else: read body, write chunks to output stream             │
 └─────────────────────────────────────────────────────────────────┘
@@ -268,8 +268,7 @@ See [Event Loop](/docs/architecture/event-loop) for the full picture.
 | ------------------------------------------------------ | ---------------------------------------------------- |
 | `openworkers-core/src/http.rs`                         | HttpRequest, HttpResponse, RequestBody, ResponseBody |
 | `openworkers-runner/src/ops.rs`                        | `do_fetch()` with reqwest streaming                  |
-| `openworkers-runtime-v8/src/worker.rs`                 | V8 worker, response extraction                       |
-| `openworkers-runtime-v8/src/runtime/mod.rs`            | Event loop, stream forwarding                        |
+| `openworkers-runtime-v8/src/execution_context.rs`      | Event loop, response extraction                      |
 | `openworkers-runtime-v8/src/runtime/stream_manager.rs` | Bounded channel coordination                         |
 
 ---
@@ -280,10 +279,12 @@ See [Event Loop](/docs/architecture/event-loop) for the full picture.
 
 ```javascript
 // This works, but the body is fully buffered first
-addEventListener('fetch', async (event) => {
-  const body = await event.request.text(); // Already buffered
-  // ...
-});
+export default {
+  async fetch(request) {
+    const body = await request.text(); // Already buffered
+    // ...
+  }
+};
 ```
 
 The client opts into a streamed body with the `x-request-body-stream` header. For large uploads, use presigned S3 URLs instead.
@@ -312,8 +313,9 @@ return new Response(await fetch(...).then(r => r.text()));
 
 ```javascript
 // ✅ Efficient: streams through without buffering
-addEventListener('fetch', async (event) => {
-  const upstream = await fetch('https://cdn.example.com/large-file');
-  event.respondWith(upstream); // Streams directly
-});
+export default {
+  async fetch() {
+    return fetch('https://cdn.example.com/large-file'); // Streams directly
+  }
+};
 ```

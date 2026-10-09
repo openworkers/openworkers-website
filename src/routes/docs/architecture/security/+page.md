@@ -417,7 +417,7 @@ pub struct RuntimeLimits {
 
 For security auditors:
 
-- [x] V8 heap limits enforced (`runtime/mod.rs`)
+- [x] V8 heap limits enforced (`security/heap_limit.rs`)
 - [x] ArrayBuffer allocator limits external memory (`security/array_buffer_allocator.rs`)
 - [x] CPU enforcer terminates on timeout (`security/cpu_enforcer.rs`)
 - [x] Wall-clock guard terminates on timeout (`security/timeout_guard.rs`)

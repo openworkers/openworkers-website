@@ -305,7 +305,7 @@ There are actually **two separate loops** that work together:
 Runs continuously in the background, spawning async tasks:
 
 ```rust
-// runtime/mod.rs - run_event_loop()
+// runtime/scheduler.rs - run_event_loop()
 async fn run_event_loop(scheduler_rx, callback_tx, ops) {
     loop {
         select! {
@@ -439,8 +439,8 @@ This allows the Runner to:
 
 | File                                                   | Purpose                                       |
 | ------------------------------------------------------ | --------------------------------------------- |
-| `openworkers-runtime-v8/src/worker.rs`                 | Worker struct, exec() loop                    |
-| `openworkers-runtime-v8/src/runtime/mod.rs`            | Runtime struct, scheduler, process_callbacks  |
+| `openworkers-runtime-v8/src/execution_context.rs`      | exec(), the event loop, process_callbacks     |
+| `openworkers-runtime-v8/src/runtime/scheduler.rs`      | Scheduler: run_event_loop, timers, ops        |
 | `openworkers-runtime-v8/src/runtime/bindings/`         | Native V8 functions                           |
 | `openworkers-runtime-v8/src/runtime/stream_manager.rs` | Stream coordination                           |
 | `openworkers-core/src/ops.rs`                          | Operation, OperationResult enums              |

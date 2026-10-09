@@ -75,34 +75,34 @@ curl -X PATCH https://dash.openworkers.com/api/v1/environments/my-env \
 ## Usage
 
 ```javascript
-addEventListener('fetch', async (event) => {
-  const { pathname } = new URL(event.request.url);
+export default {
+  async fetch(request, env) {
+    const { pathname } = new URL(request.url);
 
-  if (event.request.method === 'GET') {
-    const data = await env.STORAGE.get(pathname);
+    if (request.method === 'GET') {
+      const data = await env.STORAGE.get(pathname);
 
-    if (!data) {
-      event.respondWith(new Response('Not found', { status: 404 }));
-      return;
+      if (!data) {
+        return new Response('Not found', { status: 404 });
+      }
+
+      return new Response(data);
     }
 
-    event.respondWith(new Response(data));
-    return;
-  }
+    if (request.method === 'PUT') {
+      const body = await request.text();
+      await env.STORAGE.put(pathname, body);
+      return new Response('Uploaded', { status: 201 });
+    }
 
-  if (event.request.method === 'PUT') {
-    const body = await event.request.text();
-    await env.STORAGE.put(pathname, body);
-    event.respondWith(new Response('Uploaded', { status: 201 }));
-    return;
-  }
+    if (request.method === 'DELETE') {
+      await env.STORAGE.delete(pathname);
+      return new Response('Deleted', { status: 200 });
+    }
 
-  if (event.request.method === 'DELETE') {
-    await env.STORAGE.delete(pathname);
-    event.respondWith(new Response('Deleted', { status: 200 }));
-    return;
+    return new Response('Method not allowed', { status: 405 });
   }
-});
+};
 ```
 
 ## Operations
@@ -187,31 +187,27 @@ await env.STORAGE.delete('uploads/old-file.txt');
 ### File upload API
 
 ```javascript
-addEventListener('fetch', async (event) => {
-  if (event.request.method !== 'POST') {
-    event.respondWith(new Response('Method not allowed', { status: 405 }));
-    return;
+export default {
+  async fetch(request, env) {
+    if (request.method !== 'POST') {
+      return new Response('Method not allowed', { status: 405 });
+    }
+
+    const formData = await request.formData();
+    const file = formData.get('file');
+
+    if (!file) {
+      return new Response('No file', { status: 400 });
+    }
+
+    const key = `uploads/${Date.now()}-${file.name}`;
+    const buffer = await file.arrayBuffer();
+
+    await env.STORAGE.put(key, new Uint8Array(buffer));
+
+    return Response.json({ key });
   }
-
-  const formData = await event.request.formData();
-  const file = formData.get('file');
-
-  if (!file) {
-    event.respondWith(new Response('No file', { status: 400 }));
-    return;
-  }
-
-  const key = `uploads/${Date.now()}-${file.name}`;
-  const buffer = await file.arrayBuffer();
-
-  await env.STORAGE.put(key, new Uint8Array(buffer));
-
-  event.respondWith(
-    new Response(JSON.stringify({ key }), {
-      headers: { 'Content-Type': 'application/json' }
-    })
-  );
-});
+};
 ```
 
 ### Check file exists before processing

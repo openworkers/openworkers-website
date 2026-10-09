@@ -117,7 +117,7 @@ export default {
 | ---------------------------- | -------------------------------------- | -------------- |
 | `new Response("json")`       | N/A (one-shot)                         | None           |
 | `ReadableStream` (user code) | `signal.aborted` or `enqueue()` throws | Minimal        |
-| `fetch()` forward            | Automatic via `__streamResponseBody`   | None           |
+| `fetch()` forward            | Automatic via `streamBody`             | None           |
 | Processed fetch              | Same as ReadableStream                 | Minimal        |
 
 ### Simple Response (No Streaming)
@@ -212,12 +212,12 @@ enqueue(chunk) {
 }
 ```
 
-### \_\_streamResponseBody Detection
+### streamBody Detection
 
 For fetch forward and processed responses:
 
 ```javascript
-// In worker.rs __streamResponseBody
+// In src/js/stream_body.js, streamBody
 while (true) {
   const { value, done } = await reader.read();
   if (done) break;
@@ -398,7 +398,7 @@ timeout 2 curl -N 'https://your-worker.workers.rocks/stream'
 | -------------------------------------------------------- | -------------------------------------------------------------- |
 | `openworkers-core/src/http.rs`                           | `StreamBody` with `Drop` notification for disconnect detection |
 | `openworkers-runner/bin/main.rs`                         | Hyper HTTP server, passes disconnect channel to response       |
-| `openworkers-runtime-v8/src/worker.rs`                   | exec() loop cancellation detection                             |
-| `openworkers-runtime-v8/src/runtime/streams.rs`          | ReadableStream with signal support                             |
+| `openworkers-runtime-v8/src/execution_context.rs`        | exec() loop cancellation detection                             |
+| `openworkers-wintertc/js/readable-stream.js`             | ReadableStream with signal support                             |
 | `openworkers-runtime-v8/src/runtime/stream_manager.rs`   | Rust-side channel management                                   |
 | `openworkers-runtime-v8/src/runtime/bindings/streams.rs` | `__responseStreamIsClosed` binding                             |
