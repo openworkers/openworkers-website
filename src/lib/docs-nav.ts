@@ -30,7 +30,8 @@ export const docsNav: NavItem[] = [
       { name: 'Overview', path: '/docs/bindings' },
       { name: 'KV', path: '/docs/bindings/kv' },
       { name: 'Storage', path: '/docs/bindings/storage' },
-      { name: 'Database', path: '/docs/bindings/database' }
+      { name: 'Database', path: '/docs/bindings/database' },
+      { name: 'D1', path: '/docs/bindings/d1' }
     ]
   },
   {

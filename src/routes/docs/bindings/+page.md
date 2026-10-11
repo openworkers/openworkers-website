@@ -22,6 +22,7 @@ const apiKey = env.API_KEY; // Secret (hidden in logs)
 | [Storage](/docs/bindings/storage)   | Read/Write | Blob storage (S3/R2) with `get`, `put`, `head`, `list`, `delete` |
 | [KV](/docs/bindings/kv)             | Read/Write | Key-value store with TTL support                                 |
 | [Database](/docs/bindings/database) | Read/Write | PostgreSQL database with parameterized queries                   |
+| [D1](/docs/bindings/d1)             | Read/Write | SQLite database with the Cloudflare D1 API                       |
 | [Assets](/docs/frameworks/static)   | Read-only  | Static files from the worker bundle, served with `fetch(path)`   |
 
 ---
