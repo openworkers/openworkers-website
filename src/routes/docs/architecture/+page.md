@@ -5,48 +5,29 @@ OpenWorkers runs JavaScript and TypeScript workers in V8 isolates. This section 
 ## Components
 
 ```
-┌──────────────────────────────────────────────────────────────────┐
-│                         Dashboard                                │
-│                  (served by the API worker)                      │
-└───────────────────────────┬──────────────────────────────────────┘
-                            │                              │
-                         REST                             SSE
-                            │                              │
-                            ▼                              ▼
-┌──────────────────────────────────────────┐      ┌─────────────────┐
-│                   API                    │      │      Logs       │
-│      (TypeScript, runs as a worker)      │      │     (Rust)      │
-│   User-facing REST API, CRUD operations  │      │                 │
-└──────────────────────────────────────────┘      │ - NATS → DB     │
-                            │                     │ - SSE streaming │
-                            ▼                     └─────────────────┘
-┌──────────────────────────────────────────┐              │
-│               Postgate                   │              │
-│                (Rust)                    │              │
-│   PostgreSQL proxy, row-level security   │              │
-└──────────────────────────────────────────┘              │
-                            │                             │
-                            ▼                             ▼
-┌──────────────────────────────────────────────────────────────────┐
-│                         PostgreSQL                               │
-│              Workers, environments, bindings, users, logs        │
-└──────────────────────────────────────────────────────────────────┘
-          │                             │               │
-          │                             │               │
-          ▼                             ▼               ▼
-┌─────────────────────────────┐   ┌───────────┐   ┌───────────┐
-│           Runner            │◄──│ Scheduler │   │    CLI    │
-│           (Rust)            │   │  (Rust)   │   │  (Rust)   │
-│                             │   │           │   │           │
-│  ──► HTTP requests          │   │           │   │           │
-│  ──► Scheduler signal       │   │  Watches  │   │  Infra/   │
-│  ┌────────────────────────┐ │   │   crons   │   │   admin   │
-│  │      V8 Runtime        │ │   │           │   │           │
-│  │  Isolates, Web APIs,   │ │   │   NATS    │   │           │
-│  │    native bindings     │ │   │  events   │   │           │
-│  └────────────────────────┘ │   └───────────┘   └───────────┘
-└─────────────────────────────┘
+  clients, dashboard, CLI deploys
+               |
+               v
+  +----------------------------------+        +-------------+
+  |              Runner              |        |     CLI     |
+  |              (Rust)              |        |   (Rust)    |
+  |  HTTP and HTTPS, crons, logs     |        | infra/admin |
+  |  +----------------------------+  |        +-------------+
+  |  |  V8 runtime: isolates,     |  |               |
+  |  |  Web APIs, bindings        |  |               |
+  |  |  API worker (TypeScript)   |  |               |
+  |  +----------------------------+  |               |
+  +----------------------------------+               |
+               |                                     |
+               v                                     v
+  +------------------------------------------------------------+
+  |                        PostgreSQL                          |
+  |       Workers, environments, bindings, users, logs         |
+  +------------------------------------------------------------+
 ```
+
+One runner serves all the traffic, the API worker included. The runner also
+runs the crons, and stores and streams the console logs.
 
 ## Key Principles
 
@@ -69,7 +50,7 @@ Each worker runs in a V8 isolate with:
 - Memory limits
 - CPU time limits
 - No filesystem access
-- No network access except via bindings
+- Network access only through `fetch()` and bindings
 
 ### 3. Single Source of Truth
 
@@ -79,23 +60,24 @@ PostgreSQL is the single source of truth. All components read from/write to the 
 
 The API runs as a worker on the platform (dogfooding). If the platform is down, the API is down. All infrastructure operations go through the CLI with direct DB access.
 
-### 5. Logs via NATS
+### 5. Logs in the Runner
 
-Workers emit logs via `console.log`. The flow:
+Workers emit logs with `console.log`. The flow:
 
 1. Worker calls `console.log('message')`
-2. Runner publishes to NATS (`logs.<worker_id>`)
-3. Logs service subscribes, writes to PostgreSQL
-4. Dashboard connects via SSE for live streaming
+2. Runner sends the line to the live log streams at once
+3. Runner writes the lines to the `logs` table in batches
+4. Dashboard reads the live lines over SSE or WebSocket
 
-This decouples log ingestion from request handling.
+A log client that falls 1024 lines behind is disconnected and must connect
+again.
 
 ### 6. Unified Database Access via Postgate
 
 [Postgate](https://github.com/openworkers/postgate) is a PostgreSQL HTTP proxy with token-based authentication. It serves two purposes:
 
-1. **API access** — The OpenWorkers API uses Postgate HTTP to query the platform database
-2. **Worker bindings** — The runner uses Postgate as a library for `env.DB.query()` calls
+1. **Worker bindings**: the runner embeds Postgate as a library for `env.DB.query()` calls. The API worker reaches the platform database through such a binding.
+2. **HTTP access**: the API, when it runs as a plain Bun process in development, queries the platform database through Postgate HTTP.
 
 Both share the same database and token system via PostgreSQL views:
 
@@ -156,8 +138,6 @@ OpenWorkers is open source. Contributions welcome!
 | [openworkers-runtime-v8](https://github.com/openworkers/openworkers-runtime-v8) | V8 isolate integration                      |
 | [openworkers-core](https://github.com/openworkers/openworkers-core)             | Shared types and operations                 |
 | [openworkers-api](https://github.com/openworkers/openworkers-api)               | REST API and dashboard (TypeScript)         |
-| [openworkers-scheduler](https://github.com/openworkers/openworkers-scheduler)   | Cron job execution                          |
-| [openworkers-logs](https://github.com/openworkers/openworkers-logs)             | Log ingestion (NATS → DB) and SSE streaming |
 | [openworkers-cli](https://github.com/openworkers/openworkers-cli)               | Admin/infra tool                            |
 | [postgate](https://github.com/openworkers/postgate)                             | PostgreSQL proxy for DB bindings            |
 | [openworkers-infra](https://github.com/openworkers/openworkers-infra)           | Docker Compose setup for self-hosting       |

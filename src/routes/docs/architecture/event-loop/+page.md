@@ -455,7 +455,7 @@ We use `mpsc::unbounded_channel` for simplicity. Backpressure is handled at high
 
 ### Fire-and-Forget Logging
 
-`Log` messages don't return a result - they're sent and forgotten. The Runner handles delivery to NATS.
+`Log` messages don't return a result - they're sent and forgotten. The runner sends them to the log streams and the `logs` table.
 
 ### Callback Storage
 
