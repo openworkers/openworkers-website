@@ -36,7 +36,7 @@
     },
     {
       title: 'Web-standard runtime',
-      body: 'fetch, streams, WebCrypto, URL, TextEncoder - tracked against a WinterTC-based conformance suite. WebSockets are in beta.'
+      body: 'fetch, streams, WebCrypto, URL, TextEncoder - tracked against a WinterTC-based conformance suite. WebSockets in both directions.'
     },
     {
       title: 'Self-hostable',

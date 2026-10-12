@@ -487,6 +487,5 @@ global; // Alias (Node.js compatibility)
 
 - **No dynamic imports** — Code must be pre-bundled. Use `esbuild` or similar to bundle your code before deploying. The `export default` handler syntax works, but `import './module.js'` at runtime does not.
 - **No DOM** — No `document`, `window`, or browser-specific APIs
-- **No inbound WebSocket** — Outbound WebSocket connections are supported, accepting connections from clients is in beta. See [WebSockets](/docs/workers/websockets).
 - **No Node.js APIs** — No `fs`, `path`, `process`, etc.
 - **Single-threaded** — No Web Workers or shared memory

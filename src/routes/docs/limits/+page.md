@@ -187,3 +187,5 @@ return new Response(stream, {
 | Request body | 10 MB  | 413       |
 
 These limits apply to both `fetch` events (HTTP requests) and `scheduled` events (cron jobs). The request body limit applies to `fetch` events, buffered or streamed with the `x-request-body-stream` header.
+
+An accepted WebSocket has its own limits: it closes after 100 s with no frame, and a message over 1 MiB closes it. See [WebSockets](/docs/workers/websockets#lifetime-and-limits).

@@ -203,14 +203,14 @@ pub enum ResponseBody {
 
 ### Where Streaming Works
 
-| Use Case                 | Supported | Notes                                                |
-| ------------------------ | --------- | ---------------------------------------------------- |
-| SSE (Server-Sent Events) | ✅        | Response streams to client                           |
-| Large file download      | ✅        | Fetch response → client                              |
-| Chunked API responses    | ✅        | Progressive JSON, etc.                               |
-| Proxy pass-through       | ✅        | Fetch → forward to client                            |
-| Request body             | ✅        | Client sends the `x-request-body-stream` header      |
-| WebSocket                | ✅        | Outbound; see [WebSockets](/docs/workers/websockets) |
+| Use Case                 | Supported | Notes                                                       |
+| ------------------------ | --------- | ----------------------------------------------------------- |
+| SSE (Server-Sent Events) | ✅        | Response streams to client                                  |
+| Large file download      | ✅        | Fetch response → client                                     |
+| Chunked API responses    | ✅        | Progressive JSON, etc.                                      |
+| Proxy pass-through       | ✅        | Fetch → forward to client                                   |
+| Request body             | ✅        | Client sends the `x-request-body-stream` header             |
+| WebSocket                | ✅        | Both directions; see [WebSockets](/docs/workers/websockets) |
 
 ### Where Streaming Does NOT Work
 

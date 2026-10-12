@@ -198,18 +198,18 @@ Each reason maps to an HTTP status:
 
 Workers have access to a limited set of Web APIs:
 
-| Category        | APIs                                                                 |
-| --------------- | -------------------------------------------------------------------- |
-| **Console**     | `console.log`, `console.warn`, `console.error`, `console.debug`      |
-| **Fetch**       | `fetch()` (via operations handler)                                   |
-| **Timers**      | `setTimeout`, `setInterval`, `clearTimeout`, `clearInterval`         |
-| **Crypto**      | `crypto.getRandomValues()`, `crypto.randomUUID()`, `crypto.subtle.*` |
-| **Text**        | `TextEncoder`, `TextDecoder`, `btoa()`, `atob()`                     |
-| **Web APIs**    | `Blob`, `File`, `FormData`, `Headers`, `Request`, `Response`         |
-| **Streams**     | `ReadableStream`, `WritableStream`, `TransformStream`                |
-| **WebSocket**   | `WebSocket` (outbound), see [WebSockets](/docs/workers/websockets)   |
-| **URL**         | `URL`, `URLSearchParams`                                             |
-| **Performance** | `performance.now()` (100µs precision)                                |
+| Category        | APIs                                                                     |
+| --------------- | ------------------------------------------------------------------------ |
+| **Console**     | `console.log`, `console.warn`, `console.error`, `console.debug`          |
+| **Fetch**       | `fetch()` (via operations handler)                                       |
+| **Timers**      | `setTimeout`, `setInterval`, `clearTimeout`, `clearInterval`             |
+| **Crypto**      | `crypto.getRandomValues()`, `crypto.randomUUID()`, `crypto.subtle.*`     |
+| **Text**        | `TextEncoder`, `TextDecoder`, `btoa()`, `atob()`                         |
+| **Web APIs**    | `Blob`, `File`, `FormData`, `Headers`, `Request`, `Response`             |
+| **Streams**     | `ReadableStream`, `WritableStream`, `TransformStream`                    |
+| **WebSocket**   | `WebSocket`, `WebSocketPair`, see [WebSockets](/docs/workers/websockets) |
+| **URL**         | `URL`, `URLSearchParams`                                                 |
+| **Performance** | `performance.now()` (100µs precision)                                    |
 
 ### Crypto Algorithms
 
