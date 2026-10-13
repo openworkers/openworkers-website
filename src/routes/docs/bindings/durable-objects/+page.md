@@ -181,7 +181,7 @@ export default {
 
 A socket accepted with `ws.accept()` instead works too, with event listeners, but it keeps the object in memory while it is open.
 
-A client that leaves more than 8 MiB unread loses its connection, and the object gets `webSocketClose` with code 1008.
+A client that leaves more than 8 MiB unread, or that sends more than 8 MiB the object did not take yet, loses its connection, and the object gets `webSocketClose` with code 1008. The sockets of objects count in the open WebSockets of the runner: when they are all taken, `acceptWebSocket` does nothing and the client closes at once.
 
 ## Lifecycle
 
@@ -212,7 +212,7 @@ A client that leaves more than 8 MiB unread loses its connection, and the object
 | WebSockets per object             | 32,768                        |
 | WebSocket attachment              | 2048 bytes                    |
 | WebSocket tags                    | 10, of at most 256 characters |
-| Unread bytes of a WebSocket       | 8 MiB                         |
+| Unread bytes of a WebSocket       | 8 MiB each way                |
 
 When the objects of a namespace hold 1 GiB, a `put` fails and a new object cannot start its storage. Reads and deletes still run, and a delete frees room at once.
 
