@@ -104,7 +104,7 @@ An id is 64 hex digits. A namespace accepts only its own ids.
 | `transaction(closure)`                                     | Its writes commit together when the closure ends, or not at all. |
 | `sync()`                                                   | Resolves once the writes before it are committed.                |
 
-The operations run in the order the object makes them, so a `get` after a `put` that was not awaited reads the put.
+The operations run in the order the object makes them, so a `get` after a `put` that was not awaited reads the put. While the operations that did not end yet hold 32 MiB of keys and values, a new `get`, `put` or `delete` throws a `RangeError`; a `put` that throws so is not written, and the object goes on. Await some of the writes before more, or call `sync()`.
 
 ### Gates
 
@@ -206,6 +206,7 @@ A client that leaves more than 8 MiB unread, or that sends more than 8 MiB the o
 | Key                               | 2048 bytes                    |
 | Value                             | 128 KiB                       |
 | Keys per `get`, `put` or `delete` | 128                           |
+| Storage ops that did not end      | 32 MiB of keys and values     |
 | Storage of a namespace            | 1 GiB                         |
 | Objects of an account in memory   | 100                           |
 | Nested calls between objects      | 16                            |
