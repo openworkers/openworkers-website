@@ -181,6 +181,8 @@ export default {
 
 A socket accepted with `ws.accept()` instead works too, with event listeners, but it keeps the object in memory while it is open.
 
+A client that leaves more than 8 MiB unread loses its connection, and the object gets `webSocketClose` with code 1008.
+
 ## Lifecycle
 
 - An object with no event in flight for 60 seconds leaves memory. Its storage, its alarm and its hibernatable WebSockets stay; the next event builds it again.
@@ -204,11 +206,15 @@ A socket accepted with `ws.accept()` instead works too, with event listeners, bu
 | Key                               | 2048 bytes                    |
 | Value                             | 128 KiB                       |
 | Keys per `get`, `put` or `delete` | 128                           |
+| Storage of a namespace            | 1 GiB                         |
 | Objects of an account in memory   | 100                           |
 | Nested calls between objects      | 16                            |
 | WebSockets per object             | 32,768                        |
 | WebSocket attachment              | 2048 bytes                    |
 | WebSocket tags                    | 10, of at most 256 characters |
+| Unread bytes of a WebSocket       | 8 MiB                         |
+
+When the objects of a namespace hold 1 GiB, a `put` fails and a new object cannot start its storage. Reads and deletes still run, and a delete frees room at once.
 
 ## Durability
 
