@@ -54,14 +54,10 @@ curl -X PATCH https://dash.openworkers.com/api/v1/environments/my-env \
 ## Usage
 
 ```javascript
-export class Counter {
-  constructor(state, env) {
-    this.state = state;
-  }
-
+export class Counter extends DurableObject {
   async fetch(request) {
-    const count = ((await this.state.storage.get('count')) ?? 0) + 1;
-    this.state.storage.put('count', count);
+    const count = ((await this.ctx.storage.get('count')) ?? 0) + 1;
+    this.ctx.storage.put('count', count);
 
     return new Response(String(count));
   }
@@ -76,6 +72,8 @@ export default {
 ```
 
 The worker that exports the class can also be the one that calls it, as here.
+
+The global class `DurableObject` keeps the state as `this.ctx` and the bindings as `this.env`; there is nothing to import. A class that does not extend it gets them as the arguments of its constructor: `constructor(state, env)`.
 
 ## Ids and stubs
 
